@@ -7,3 +7,4 @@
 	editor = vim
 	autocrlf = false
 	eol = lf
+	excludesfile = ~/my-config/common/git/ignore
