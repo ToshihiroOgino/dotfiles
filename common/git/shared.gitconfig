@@ -1,0 +1,9 @@
+[user]
+	name = ToshihiroOgino
+	email = 37017644+ToshihiroOgino@users.noreply.github.com
+[init]
+	defaultBranch = main
+[core]
+	editor = vim
+	autocrlf = false
+	eol = lf
