@@ -1,0 +1,9 @@
+[font]
+normal = { family = "CaskaydiaCove NFM", style = "SemiLight" }
+
+[general]
+working_directory = "None"
+
+[window]
+padding = { x = 8, y = 8 }
+decorations = "full"
