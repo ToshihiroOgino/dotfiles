@@ -5,6 +5,10 @@ if vim.fn.has("win32") == 1 then
   LazyVim.terminal.setup("pwsh")
 end
 
+vim.o.number = true
+vim.o.relativenumber = false
+vim.o.fileformat = "unix"
+vim.o.fileformats = "unix,dos"
 vim.o.wrap = true
 vim.o.tabstop = 2
 vim.o.swapfile = false

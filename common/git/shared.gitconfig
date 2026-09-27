@@ -8,3 +8,4 @@
 	autocrlf = false
 	eol = lf
 	excludesfile = ~/my-config/common/git/ignore
+	attributesfile = ~/my-config/common/git/attributes
