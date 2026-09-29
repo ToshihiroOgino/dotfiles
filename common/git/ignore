@@ -1,7 +1,8 @@
 .venv/
 *.code-workspace
 .DS_Store
-**/.claude/settings.local.json
+*.local.*
+.history/
 .local/
 .env
 
