@@ -1,7 +1,7 @@
 $theme = "wopian"
 oh-my-posh init pwsh --config $theme | Invoke-Expression
 
-Import-Module yarn-completion
+# Import-Module yarn-completion
 # Import-Module posh-git
 
 function reload {
