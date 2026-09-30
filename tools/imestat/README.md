@@ -54,6 +54,19 @@ set -g status-right '...#{@ime} "#{=21:pane_title}" %H:%M %d-%b-%y'
 `if-shell` fails quietly where imestat is missing or unsupported, so the same
 config works everywhere; `#{@ime}` is just empty there.
 
+## herdr
+
+One-shot `imestat` runs as a tab bar status entry, see
+[common/herdr/config.toml](../../common/herdr/config.toml). herdr's
+`interval_seconds` is an integer, so the update takes up to 1 s.
+
+```toml
+[ui]
+tab_bar_right = [
+  { type = "command", command = "imestat", interval_seconds = 1, timeout_seconds = 1 },
+]
+```
+
 ## How It Works (Windows)
 
 ### Reading the IME state
