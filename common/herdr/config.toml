@@ -1,0 +1,18 @@
+onboarding = false
+
+[ui.toast]
+delivery = "system"
+
+[ui.sound]
+enabled = true
+
+[ui]
+status_indicators = "symbols"
+mouse_capture = true
+
+[terminal]
+default_shell = "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
+
+[theme]
+name = "catppuccin"
+auto_switch = false
