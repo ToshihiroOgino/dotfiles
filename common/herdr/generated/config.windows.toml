@@ -19,6 +19,16 @@ tab_bar_right = [
 ]
 tab_bar_right_separator = " "
 
+[[keys.command]]
+key = "prefix+shift+k"
+type = "shell"
+command = "herdr pane swap --current --direction up"
+
+[[keys.command]]
+key = "prefix+shift+j"
+type = "shell"
+command = "herdr pane swap --current --direction down"
+
 [theme]
 name = "catppuccin"
 auto_switch = false
