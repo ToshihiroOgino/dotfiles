@@ -1,0 +1,15 @@
+# ~/.claude 全体をここへシンボリックリンクする前提のホワイトリスト。
+# 履歴・認証情報・キャッシュなどの実行時データが混ざるので、まず全部除外する。
+*
+
+!.gitignore
+!CLAUDE.md
+!keybindings.json
+!settings.json
+
+# 自作スキルだけ管理する。
+!skills/
+!skills/**
+# synced は claude.ai から同期される組み込みスキル(UUIDディレクトリ)なので管理しない。
+# 否定パターンより後ろに書いて上書きする。
+skills/synced/
