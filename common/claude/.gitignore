@@ -7,9 +7,5 @@
 !keybindings.json
 !settings.json
 
-# 自作スキルだけ管理する。
-!skills/
-!skills/**
-# synced は claude.ai から同期される組み込みスキル(UUIDディレクトリ)なので管理しない。
-# 否定パターンより後ろに書いて上書きする。
-skills/synced/
+# skills/ は npx skills が ~/.agents/skills へのシンボリックリンクとして作る。
+# 絶対パスで壊れやすいので管理しない(再現は common/agents/.skill-lock.json から)。

@@ -32,6 +32,15 @@ ln -s ~/dotfiles/common/claude ~/.claude
 
 既存の `~/.claude` がある場合は、先に中身を `common/claude` へ移動しておく。
 
-- 管理対象: `CLAUDE.md` / `keybindings.json` / `settings.json` / `skills/` (自作分)
-- `skills/synced/` は claude.ai から同期される組み込みスキルなので管理しない
+- 管理対象: `CLAUDE.md` / `keybindings.json` / `settings.json`
+- `skills/` は `npx skills` が作るシンボリックリンクなので管理しない (下の Agent skills 参照)
 - `git clean -fdx` は ignore 済みの履歴・セッションも消すので `common/claude` では使わない
+
+## Agent skills
+
+`npx skills` の管理ファイル `~/.agents/.skill-lock.json` だけを `common/agents` で管理する。`~/.agents/skills/` はロックファイルから再生成できるので置かない。
+
+```powershell
+New-Item -ItemType Directory ~\.agents -Force
+New-Item -ItemType SymbolicLink -Path ~\.agents\.skill-lock.json -Target ~\dotfiles\common\agents\.skill-lock.json
+```
