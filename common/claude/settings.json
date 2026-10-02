@@ -13,6 +13,5 @@
   },
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
-  "theme": "dark",
-  "editorMode": "normal"
+  "theme": "dark"
 }
