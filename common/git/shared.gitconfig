@@ -7,5 +7,6 @@
 	editor = vim
 	autocrlf = false
 	eol = lf
+	safecrlf = false
 	excludesfile = ~/dotfiles/common/git/ignore
 	attributesfile = ~/dotfiles/common/git/attributes
