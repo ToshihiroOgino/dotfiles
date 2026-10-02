@@ -1,3 +1,7 @@
+# GENERATED FILE - DO NOT EDIT
+# source: config.base.toml + windows.toml
+# regen:  make windows
+
 onboarding = false
 
 [ui.toast]
@@ -15,9 +19,9 @@ tab_bar_right = [
 ]
 tab_bar_right_separator = " "
 
-[terminal]
-default_shell = "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
-
 [theme]
 name = "catppuccin"
 auto_switch = false
+
+[terminal]
+default_shell = "C:\\Program Files\\PowerShell\\7\\pwsh.exe"

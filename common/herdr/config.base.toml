@@ -1,0 +1,20 @@
+onboarding = false
+
+[ui.toast]
+delivery = "system"
+
+[ui.sound]
+enabled = true
+
+[ui]
+status_indicators = "symbols"
+mouse_capture = true
+tab_bar_right = [
+  { type = "command", command = "imestat", interval_seconds = 1, timeout_seconds = 1 },
+  { type = "datetime", format = "%m/%d %H:%M" },
+]
+tab_bar_right_separator = " "
+
+[theme]
+name = "catppuccin"
+auto_switch = false
