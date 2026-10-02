@@ -12,6 +12,7 @@ enabled = true
 
 [ui]
 status_indicators = "symbols"
+redraw_on_focus_gained = true
 mouse_capture = true
 tab_bar_right = [
   { type = "command", command = "imestat", interval_seconds = 1, timeout_seconds = 1 },
