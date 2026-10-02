@@ -7,3 +7,9 @@ working_directory = "None"
 [window]
 padding = { x = 8, y = 8 }
 decorations = "full"
+
+# Claude Code などで Shift+Enter を改行として区別させる(CSI u 形式で送る)。
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001b[13;2u"
