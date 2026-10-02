@@ -7,5 +7,5 @@
 	editor = vim
 	autocrlf = false
 	eol = lf
-	excludesfile = ~/my-config/common/git/ignore
-	attributesfile = ~/my-config/common/git/attributes
+	excludesfile = ~/dotfiles/common/git/ignore
+	attributesfile = ~/dotfiles/common/git/attributes

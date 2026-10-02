@@ -2,4 +2,4 @@
 
 ## Usage
 
-Clone this repo into ~/my-config.
+Clone this repo into ~/dotfiles.

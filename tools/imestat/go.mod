@@ -1,3 +1,3 @@
-module github.com/ToshihiroOgino/my-config/tools/imestat
+module github.com/ToshihiroOgino/dotfiles/tools/imestat
 
 go 1.27

@@ -7,12 +7,12 @@ psmux (Windows native tmux) also reads `~/.tmux.conf`.
 
 ```sh
 # Linux / macOS / WSL
-ln -s ~/my-config/common/tmux/tmux.conf ~/.tmux.conf
+ln -s ~/dotfiles/common/tmux/tmux.conf ~/.tmux.conf
 ```
 
 ```powershell
 # Windows (psmux)
-New-Item -ItemType SymbolicLink -Path ~/.tmux.conf -Target ~/my-config/common/tmux/tmux.conf
+New-Item -ItemType SymbolicLink -Path ~/.tmux.conf -Target ~/dotfiles/common/tmux/tmux.conf
 ```
 
 ## IME Indicator

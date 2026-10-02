@@ -12,11 +12,11 @@ override the imported values.
 
 ```toml
 [general]
-import = ["~/my-config/common/alacritty/alacritty.toml"]
+import = ["~/dotfiles/common/alacritty/alacritty.toml"]
 
 [terminal]
 shell = "pwsh.exe"
 ```
 
 `~/` is expanded by Alacritty itself, so the same line works on any machine
-that clones this repo into `~/my-config`.
+that clones this repo into `~/dotfiles`.
