@@ -14,3 +14,5 @@ vim.o.swapfile = false
 vim.o.scrolloff = 10
 vim.o.backup = false
 vim.o.writebackup = false
+
+vim.opt.spelllang = { "en", "cjk" }

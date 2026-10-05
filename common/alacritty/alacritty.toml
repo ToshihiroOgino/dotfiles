@@ -1,5 +1,7 @@
 [font]
-normal = { family = "CaskaydiaCove NFM", style = "SemiLight" }
+# normal = { family = "CaskaydiaCove NFM", style = "SemiLight" }
+normal = { family = "Moralerspace Neon" }
+# normal = { family = "PlemolJP35 Console NF" }
 
 [general]
 working_directory = "None"
