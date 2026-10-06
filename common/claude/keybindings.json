@@ -7,6 +7,13 @@
       "bindings": {
         "shift+enter": "chat:newline"
       }
+    },
+    {
+      "context": "Task",
+      "bindings": {
+        "ctrl+b": null,
+        "ctrl+shift+b": "task:background"
+      }
     }
   ]
 }

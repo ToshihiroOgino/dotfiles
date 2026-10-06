@@ -15,3 +15,9 @@ decorations = "full"
 key = "Return"
 mods = "Shift"
 chars = "\u001b[13;2u"
+
+# Claude Code の task:background (Ctrl+Shift+B) に使うため、デフォルトの SearchBackward を無効化。
+[[keyboard.bindings]]
+key = "B"
+mods = "Control|Shift"
+action = "None"
