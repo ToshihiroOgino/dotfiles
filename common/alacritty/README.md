@@ -20,3 +20,16 @@ shell = "pwsh.exe"
 
 `~/` is expanded by Alacritty itself, so the same line works on any machine
 that clones this repo into `~/dotfiles`.
+
+## macOS
+
+macOS では `~/.config/alacritty/alacritty.toml` から、共通設定に加えて
+macOS 専用設定(Option+←/→ での単語移動)を import する。
+
+```toml
+[general]
+import = [
+  "~/dotfiles/common/alacritty/alacritty.toml",
+  "~/dotfiles/common/alacritty/mac.toml",
+]
+```
