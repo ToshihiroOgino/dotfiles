@@ -24,7 +24,7 @@ that clones this repo into `~/dotfiles`.
 ## macOS
 
 macOS では `~/.config/alacritty/alacritty.toml` から、共通設定に加えて
-macOS 専用設定(Option+←/→ での単語移動)を import する。
+macOS 専用設定(フォントサイズ、Option+←/→ での単語移動)を import する。
 
 ```toml
 [general]

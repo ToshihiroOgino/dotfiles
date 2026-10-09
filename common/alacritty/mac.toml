@@ -1,3 +1,6 @@
+[font]
+size = 13
+
 # Option+←/→ で単語単位の移動(ESC b / ESC f)。
 [[keyboard.bindings]]
 key = "Left"
