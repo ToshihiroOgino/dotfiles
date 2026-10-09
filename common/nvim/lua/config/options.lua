@@ -11,7 +11,7 @@ vim.o.fileformats = "unix,dos"
 vim.o.wrap = true
 vim.o.tabstop = 2
 vim.o.swapfile = false
-vim.o.scrolloff = 10
+vim.o.scrolloff = 5
 vim.o.backup = false
 vim.o.writebackup = false
 vim.opt.whichwrap:append("h,l,<,>,[,]")
