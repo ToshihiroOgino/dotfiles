@@ -22,15 +22,16 @@ goes to stderr and the exit code is 1.
 | ------- | --------------------------------------- |
 | Windows | Supported (psmux)                       |
 | Linux   | Stub (builds, exits 1)                  |
-| macOS   | Stub (builds, exits 1)                  |
+| macOS   | Supported (cgo, Carbon TIS; experimental) |
 
-Platform code lives in `*_windows.go` / `*_other.go` files selected by build
-constraints. To add an OS, add `ime_<os>.go` / `watch_<os>.go` and narrow the
-constraint in the `*_other.go` files.
+Platform code lives in `*_windows.go` / `*_darwin.go` / `*_other.go` files selected
+by build constraints. To add an OS, add `ime_<os>.go` / `watch_<os>.go` and narrow
+the constraint in the `*_other.go` files.
 
 ## Build / Install
 
 Requires Go. Recipes only call `go`, so any `make` works (cmd, pwsh, or sh).
+macOS builds with cgo, so the Xcode Command Line Tools (`xcode-select --install`) are needed.
 
 ```sh
 make build    # ./imestat(.exe)
@@ -102,6 +103,23 @@ Only `syscall` is used; no cgo or C compiler is needed.
 - Without a psmux server among its ancestors, `--watch` exits with an error
   instead of running forever. Pass `--server-pid <pid>` to run it by hand.
 - `-L <socket>` targets another tmux socket (used for testing).
+
+## How It Works (macOS)
+
+- `TISCopyCurrentKeyboardInputSource` returns the current input source, and
+  `kTISPropertyInputModeID` its mode. Input methods have one mode per state
+  (`com.apple.inputmethod.Japanese` for hiragana, `...Roman` for alphanumeric);
+  plain keyboard layouts (ABC, U.S.) have none. `あ` means a mode that does not
+  end in `.Roman`, `A` anything else.
+- The input source is global, not per window, so unlike Windows the foreground
+  app does not matter. The main goroutine is locked to the main thread and the
+  run loop is pumped once per call, otherwise a resident process keeps seeing a
+  stale value.
+- `--watch` polls every 100 ms like on Windows. There is one tmux server, so a
+  file lock (`$TMPDIR/imestat-watch[-socket].lock`) is enough to keep a single
+  watcher; a watcher left over from an earlier server waits on it. It exits
+  after three failed `list-sessions` checks (2 s apart), i.e. when the server is
+  gone. `--server-pid` is ignored.
 
 ## Limitations
 
