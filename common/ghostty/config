@@ -1,0 +1,4 @@
+font-family = "Moralerspace Neon"
+
+keybind = ctrl+enter=unbind
+keybind = f11=toggle_fullscreen

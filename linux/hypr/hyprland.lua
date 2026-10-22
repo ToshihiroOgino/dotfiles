@@ -35,7 +35,7 @@ hl.monitor({
 ---------------------
 
 -- Set programs that you use
-local terminal = "alacritty"
+local terminal = "ghostty"
 local fileManager = "thunar"
 local menu        = "hyprlauncher"
 
@@ -67,6 +67,7 @@ hl.env("HYPRCURSOR_SIZE", "24")
 -- fcitx5 (Japanese input)
 hl.env("XMODIFIERS", "@im=fcitx")
 hl.env("QT_IM_MODULE", "fcitx")
+hl.env("GTK_IM_MODULE", "fcitx")
 hl.env("SDL_IM_MODULE", "fcitx")
 
 hl.on("hyprland.start", function ()
