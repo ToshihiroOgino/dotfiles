@@ -21,3 +21,7 @@ chars = "\u001b[13;2u"
 key = "B"
 mods = "Control|Shift"
 action = "None"
+
+[[keyboard.bindings]]
+key = "F11"
+action = "ToggleFullscreen"
