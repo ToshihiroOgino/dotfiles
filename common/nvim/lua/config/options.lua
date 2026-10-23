@@ -5,15 +5,11 @@ if vim.fn.has("win32") == 1 then
   LazyVim.terminal.setup("pwsh")
 end
 
-vim.o.relativenumber = true
-vim.o.fileformat = "unix"
-vim.o.fileformats = "unix,dos"
-vim.o.wrap = true
-vim.o.tabstop = 2
-vim.o.swapfile = false
-vim.o.scrolloff = 5
-vim.o.backup = false
-vim.o.writebackup = false
-vim.opt.whichwrap:append("h,l,<,>,[,]")
+-- vim と共通の設定は common/vim/vimrc に置く
+local vimrc = vim.fn.fnamemodify(vim.fn.resolve(vim.fn.stdpath("config")), ":h") .. "/vim/vimrc"
+if vim.fn.filereadable(vimrc) == 1 then
+  vim.cmd.source(vim.fn.fnameescape(vimrc))
+end
 
-vim.opt.spelllang = { "en", "cjk" }
+-- nvim 固有 (バッファローカルのため vimrc では効果が薄い)
+vim.o.fileformat = "unix"
