@@ -1,7 +1,0 @@
-tree-sitter
-gcc
-tar
-curl
-ripgrep
-fd
-CaskaydiaCove Nerd Font
