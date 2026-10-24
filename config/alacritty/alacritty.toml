@@ -1,0 +1,30 @@
+[font]
+# normal = { family = "CaskaydiaCove NFM", style = "SemiLight" }
+normal = { family = "Moralerspace Neon" }
+# normal = { family = "PlemolJP35 Console NF" }
+
+[general]
+working_directory = "None"
+# Machine-local additions. This file wins on conflicts, so keys that differ
+# per machine (shell, font size) must not be set here, only in the local file.
+import = ["alacritty.local.toml"]
+
+[window]
+padding = { x = 8, y = 8 }
+decorations = "full"
+
+# Claude Code などで Shift+Enter を改行として区別させる(CSI u 形式で送る)。
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001b[13;2u"
+
+# Claude Code の task:background (Ctrl+Shift+B) に使うため、デフォルトの SearchBackward を無効化。
+[[keyboard.bindings]]
+key = "B"
+mods = "Control|Shift"
+action = "None"
+
+[[keyboard.bindings]]
+key = "F11"
+action = "ToggleFullscreen"

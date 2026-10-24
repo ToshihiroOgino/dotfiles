@@ -1,0 +1,6 @@
+/config/*/*.local
+/config/*/*.local.*
+!/config/*/templates/*
+
+# Logs written by the scripts (log/link.log).
+/log/

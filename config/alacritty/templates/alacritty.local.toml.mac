@@ -1,0 +1,13 @@
+[font]
+size = 12
+
+# Option+←/→ で単語単位の移動(ESC b / ESC f)。
+[[keyboard.bindings]]
+key = "Left"
+mods = "Alt"
+chars = "\u001bb"
+
+[[keyboard.bindings]]
+key = "Right"
+mods = "Alt"
+chars = "\u001bf"

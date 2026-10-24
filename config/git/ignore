@@ -1,0 +1,13 @@
+.venv/
+*.code-workspace
+.DS_Store
+*.local.*
+.history/
+.local/
+.env
+
+# vim swap/backup/undo files
+*~
+*.swp
+*.swo
+.*.un~
