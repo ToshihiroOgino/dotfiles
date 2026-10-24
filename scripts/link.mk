@@ -14,7 +14,7 @@ LINK := sh $(SCRIPTS)link.sh
 LINK_LOCAL := $(LINK) --local
 
 COMMON        := git claude tmux nvim vim lazygit alacritty herdr
-TOOLS_wsl     := $(COMMON) ghostty
+TOOLS_wsl     := $(COMMON) ghostty wsl
 TOOLS_linux   := $(COMMON) ghostty
 TOOLS_mac     := $(COMMON) ghostty
 TOOLS_windows := $(COMMON) pwsh
@@ -61,6 +61,13 @@ link-alacritty:
 link-ghostty:
 	$(LINK) config/ghostty/config.ghostty "$(HOME)/.config/ghostty/config.ghostty"
 	$(LINK_LOCAL) config/ghostty/config.local "$(HOME)/.config/ghostty/config.local"
+
+# WSLg-only settings: input method (fcitx5), GPU and GTK environment.
+# Run `make systemd-enable` once to start fcitx5.service at login.
+link-wsl:
+	$(LINK) config/wsl/zshenv "$(HOME)/.zshenv"
+	$(LINK) config/wsl/gtk-4.0/settings.ini "$(HOME)/.config/gtk-4.0/settings.ini"
+	$(LINK) config/wsl/systemd/fcitx5.service "$(HOME)/.config/systemd/user/fcitx5.service"
 
 # Ask pwsh where its profile goes; skip when pwsh is not installed.
 # link.sh converts the Windows path it returns.
