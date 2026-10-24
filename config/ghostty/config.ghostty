@@ -1,0 +1,10 @@
+font-family = "Moralerspace Neon"
+
+keybind = ctrl+enter=unbind
+keybind = f11=toggle_fullscreen
+keybind = super+enter=unbind
+
+theme = Gruvbox Dark Hard
+
+# Machine-local overrides (missing file is ignored).
+config-file = ?config.local
