@@ -10,3 +10,5 @@
 	safecrlf = false
 	excludesfile = ~/dotfiles/common/git/ignore
 	attributesfile = ~/dotfiles/common/git/attributes
+[pull]
+	rebase = true
