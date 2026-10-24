@@ -12,3 +12,5 @@
 	attributesfile = ~/dotfiles/common/git/attributes
 [pull]
 	rebase = true
+[rebase]
+  autoStash = true
