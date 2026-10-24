@@ -1,21 +1,18 @@
 # Symlink definitions, included from the root Makefile.
-#   make link              # dry-run, all tools for this OS
-#   make link APPLY=1      # APPLY must be exactly 1
+#   make link              # all tools for this OS
 #   make link-nvim         # one tool
 
 # Directory of this file, so the scripts are found from any working directory.
 SCRIPTS := $(dir $(lastword $(MAKEFILE_LIST)))
 
-# ---- OS detection ----
 PLATFORM := $(shell sh $(SCRIPTS)os.sh)
 $(if $(PLATFORM),,$(error cannot detect the platform: $(SCRIPTS)os.sh failed))
 FAMILY := $(if $(filter windows,$(PLATFORM)),windows,unix)
 
-LINK := sh $(SCRIPTS)link.sh $(if $(filter 1,$(APPLY)),--apply)
+LINK := sh $(SCRIPTS)link.sh
 # For machine-local files: created from templates/ when missing.
 LINK_LOCAL := $(LINK) --local
 
-# ---- which tools on which OS ----
 COMMON        := git claude tmux nvim vim lazygit alacritty herdr
 TOOLS_wsl     := $(COMMON) ghostty
 TOOLS_linux   := $(COMMON) ghostty
@@ -28,7 +25,6 @@ ALL_TOOLS := $(sort $(TOOLS_wsl) $(TOOLS_linux) $(TOOLS_mac) $(TOOLS_windows))
 
 link: $(addprefix link-,$(TOOLS_$(PLATFORM)))
 
-# ---- where each tool goes (per OS family when it differs) ----
 link-git:
 	$(LINK) config/git "$(HOME)/.config/git"
 link-claude:
