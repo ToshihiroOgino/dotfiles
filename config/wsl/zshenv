@@ -1,0 +1,11 @@
+# Input method (fcitx5)
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS=@im=fcitx
+
+# GTK apps (ghostty): Wayland backend + fcitx GTK module draws the candidate window in the app
+export GDK_BACKEND=wayland
+# Silence libEGL DRI3 warnings (WSLg X server has no DRI3)
+export EGL_LOG_LEVEL=fatal
+# Use the WSL GPU (D3D12) for Mesa; zink fails to pick a device and falls back to llvmpipe
+export GALLIUM_DRIVER=d3d12
