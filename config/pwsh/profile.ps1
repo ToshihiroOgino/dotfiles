@@ -30,6 +30,7 @@ function Set-Env {
 }
 
 Set-Env CMAKE_GENERATOR "Ninja"
+Set-Env BAT_PAGER "less -RF --mouse"
 
 Remove-Item Function:\Set-Env
 

@@ -12,5 +12,6 @@ fi
 export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 alias bat=batcat
 export CMAKE_GENERATOR=Ninja
+export BAT_PAGER="less -RF --mouse"
 
 [[ -r ~/.local.zshrc ]] && source ~/.local.zshrc
