@@ -6,6 +6,8 @@ keybind = super+enter=unbind
 
 theme = Gruvbox Dark Hard
 
+app-notifications = no-clipboard-copy
+
 mouse-scroll-multiplier = 1
 
 # Machine-local overrides (missing file is ignored).
