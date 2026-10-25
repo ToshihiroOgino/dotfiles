@@ -6,5 +6,7 @@ keybind = super+enter=unbind
 
 theme = Gruvbox Dark Hard
 
+mouse-scroll-multiplier = 1
+
 # Machine-local overrides (missing file is ignored).
 config-file = ?config.local
