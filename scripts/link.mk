@@ -14,9 +14,9 @@ LINK := sh $(SCRIPTS)link.sh
 LINK_LOCAL := $(LINK) --local
 
 COMMON        := git claude tmux nvim vim lazygit alacritty herdr
-TOOLS_wsl     := $(COMMON) ghostty wsl
-TOOLS_linux   := $(COMMON) ghostty
-TOOLS_mac     := $(COMMON) ghostty
+TOOLS_wsl     := $(COMMON) ghostty wsl zsh
+TOOLS_linux   := $(COMMON) ghostty zsh
+TOOLS_mac     := $(COMMON) ghostty zsh
 TOOLS_windows := $(COMMON) pwsh
 
 ALL_TOOLS := $(sort $(TOOLS_wsl) $(TOOLS_linux) $(TOOLS_mac) $(TOOLS_windows))
@@ -37,6 +37,10 @@ NVIM_unix    := $(HOME)/.config/nvim
 NVIM_windows := $(LOCALAPPDATA)/nvim
 link-nvim:
 	$(LINK) config/nvim "$(NVIM_$(FAMILY))"
+
+link-zsh:
+	$(LINK) config/zsh/zshrc "$(HOME)/.zshrc"
+	$(LINK_LOCAL) config/zsh/zshrc.local "$(HOME)/.local.zshrc"
 
 link-vim:
 	$(LINK) config/vim/vimrc "$(HOME)/.vimrc"
@@ -68,14 +72,5 @@ link-wsl:
 	$(LINK) config/wsl/zshenv "$(HOME)/.zshenv"
 	$(LINK) config/wsl/systemd/fcitx5.service "$(HOME)/.config/systemd/user/fcitx5.service"
 
-# Ask pwsh where its profile goes; skip when pwsh is not installed.
-# link.sh converts the Windows path it returns.
 link-pwsh:
-	@if command -v pwsh >/dev/null 2>&1; then \
-		profile=$$(pwsh -NoProfile -Command '$$PROFILE.CurrentUserAllHosts' | tr -d '\r'); \
-		[ -n "$$profile" ] || { echo "error: pwsh did not return the profile path" >&2; exit 1; }; \
-		$(LINK) config/pwsh/profile.ps1 "$$profile"; \
-		$(LINK_LOCAL) config/pwsh/profile.local.ps1 "$$(dirname "$$(cygpath -u "$$profile")")/profile.local.ps1"; \
-	else \
-		echo "skip     pwsh (not installed)"; \
-	fi
+	@sh $(SCRIPTS)link-pwsh.sh
