@@ -1,13 +1,13 @@
 $theme = "wopian"
 oh-my-posh init pwsh --config $theme | Invoke-Expression
 
-# Prefix the prompt with a red [sudo] when running elevated.
+# Strip the OS icon, and prefix a red [sudo] when running elevated.
 $isElevated = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-if ($isElevated) {
-  $global:__ompPrompt = ${function:prompt}
-  function global:prompt {
-    "`e[31m[sudo]`e[0m " + (& $global:__ompPrompt)
-  }
+$global:__ompPrompt = ${function:prompt}
+function global:prompt {
+  $p = (& $global:__ompPrompt) -replace '[\ue62a\uf17a]', ''
+  if ($isElevated) { $p = "`e[31m[sudo]`e[0m " + $p }
+  $p
 }
 
 # Import-Module yarn-completion
