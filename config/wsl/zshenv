@@ -9,3 +9,6 @@ export GDK_BACKEND=wayland
 export EGL_LOG_LEVEL=fatal
 # Use the WSL GPU (D3D12) for Mesa; zink fails to pick a device and falls back to llvmpipe
 export GALLIUM_DRIVER=d3d12
+
+# Open URLs in the Windows default browser (xdg-open / gh honor $BROWSER)
+export BROWSER="$HOME/dotfiles/scripts/wsl-browser.sh"

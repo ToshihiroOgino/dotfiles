@@ -5,6 +5,8 @@ After=graphical-session.target
 [Service]
 # The wayland addons exit right after connecting to WSLg's Weston.
 ExecStart=/usr/bin/fcitx5 --disable=wayland,waylandim
+Environment=DISPLAY=:0
+Environment=WAYLAND_DISPLAY=wayland-0
 Restart=on-failure
 
 [Install]

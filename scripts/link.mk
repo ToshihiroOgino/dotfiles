@@ -66,7 +66,6 @@ link-ghostty:
 # Run `make systemd-enable` once to start fcitx5.service at login.
 link-wsl:
 	$(LINK) config/wsl/zshenv "$(HOME)/.zshenv"
-	$(LINK) config/wsl/gtk-4.0/settings.ini "$(HOME)/.config/gtk-4.0/settings.ini"
 	$(LINK) config/wsl/systemd/fcitx5.service "$(HOME)/.config/systemd/user/fcitx5.service"
 
 # Ask pwsh where its profile goes; skip when pwsh is not installed.
