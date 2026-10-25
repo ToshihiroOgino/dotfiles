@@ -99,6 +99,7 @@ func cmdApply(root string, prune bool) error {
 	defer release()
 	// A failure in one manager must not stop the others or hide the
 	// "commit and push" reminder for what was already written.
+	p := painter(colorEnabled(os.Stdout))
 	var errs []error
 	var changed bool
 	for _, m := range ms {
@@ -107,7 +108,7 @@ func cmdApply(root string, prune bool) error {
 			errs = append(errs, err)
 			continue
 		}
-		fmt.Printf("[%s]\n", m.Name())
+		fmt.Println(p.paint(bold, "["+m.Name()+"]"))
 		// Removals that add leaves alone stay pending.
 		var rest Diff
 		if !prune {
@@ -122,7 +123,7 @@ func cmdApply(root string, prune bool) error {
 				errs = append(errs, err)
 				continue
 			}
-			fmt.Print(d)
+			fmt.Print(d.format(p))
 			changed = true
 		}
 		if err := writePending(root, m, rest, s.Warnings); err != nil {
