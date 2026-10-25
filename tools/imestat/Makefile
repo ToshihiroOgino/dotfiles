@@ -5,7 +5,7 @@ LDFLAGS := -s -w
 
 # Outputs imestat.exe on Windows, imestat elsewhere.
 build:
-	go build -ldflags "$(LDFLAGS)" .
+	go build -trimpath -ldflags "$(LDFLAGS)" .
 
 # Installs into $(go env GOBIN) or ~/go/bin, which must be on PATH.
 install:
