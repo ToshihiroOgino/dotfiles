@@ -4,10 +4,13 @@
 
 include scripts/link.mk
 
-.PHONY: imestat systemd-enable
+.PHONY: imestat pkgsync systemd-enable
 
 imestat:
 	"$(MAKE)" -C tools/imestat build
+
+pkgsync:
+	"$(MAKE)" -C tools/pkgsync build
 
 # Not part of `make link`: enabling a unit changes systemd state. WSL only.
 SYSTEMD_UNITS := fcitx5.service

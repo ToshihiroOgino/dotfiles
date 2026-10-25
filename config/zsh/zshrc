@@ -1,3 +1,7 @@
+# Shows pending package changes in the prompt. Needs `make pkgsync`.
+_pkgsync_zsh="${PKGSYNC_ROOT:-$HOME/dotfiles}/tools/pkgsync/pkgsync.zsh"
+[[ -r $_pkgsync_zsh ]] && source "$_pkgsync_zsh"
+
 ZSH_THEME="eastwood"
 DISABLE_UNTRACKED_FILES_DIRTY="true"
 HIST_STAMPS="yyyy/mm/dd"
@@ -10,7 +14,10 @@ if [[ -e "$HOME/.oh-my-zsh" ]]; then
 fi
 
 export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
+
 alias bat=batcat
+alias rm=trash
+
 export CMAKE_GENERATOR=Ninja
 export BAT_PAGER="less -RF --mouse"
 

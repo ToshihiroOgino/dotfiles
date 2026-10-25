@@ -4,3 +4,6 @@
 
 # Logs written by the scripts (log/link.log).
 /log/
+
+# Per-machine state written by pkgsync.
+/packages/pending/

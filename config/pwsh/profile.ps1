@@ -10,6 +10,10 @@ function global:prompt {
   $p
 }
 
+# Shows pending package changes in the prompt. Needs `make pkgsync`.
+$pkgsyncPs1 = Join-Path ($env:PKGSYNC_ROOT ?? (Join-Path $HOME 'dotfiles')) 'tools\pkgsync\pkgsync.ps1'
+if (Test-Path $pkgsyncPs1) { . $pkgsyncPs1 }
+
 # Import-Module yarn-completion
 # Import-Module posh-git
 
