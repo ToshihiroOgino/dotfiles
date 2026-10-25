@@ -5,7 +5,7 @@ oh-my-posh init pwsh --config $theme | Invoke-Expression
 $isElevated = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 $global:__ompPrompt = ${function:prompt}
 function global:prompt {
-  $p = (& $global:__ompPrompt) -replace '[\ue62a\uf17a]', ''
+  $p = (& $global:__ompPrompt) -replace '[\ue62a\uf17a]((?:\e\[[0-9;]*m)*) ', '$1'
   if ($isElevated) { $p = "`e[31m[sudo]`e[0m " + $p }
   $p
 }
