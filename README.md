@@ -9,6 +9,7 @@
 ## Usage
 
 ```sh
+make all             # link + imestat + pkgsync + systemd-enable
 make link            # link all configs for this OS
 make imestat         # build imestat
 make pkgsync         # build pkgsync
