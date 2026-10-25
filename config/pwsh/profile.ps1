@@ -19,7 +19,19 @@ function touch {
   New-Item -ItemType File -Path $path
 }
 
-$env:CMAKE_GENERATOR = "Ninja"
+function Set-Env {
+  param (
+    [Parameter(Mandatory)][string]$Name,
+    [Parameter(Mandatory)][string]$Value
+  )
+  if (-not (Test-Path "Env:$Name")) {
+    Set-Item -Path "Env:$Name" -Value $Value
+  }
+}
+
+Set-Env CMAKE_GENERATOR "Ninja"
+
+Remove-Item Function:\Set-Env
 
 # Machine-local overrides.
 $localProfile = Join-Path (Split-Path $PROFILE.CurrentUserAllHosts) 'profile.local.ps1'
