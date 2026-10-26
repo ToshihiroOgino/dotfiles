@@ -1,0 +1,28 @@
+{
+  "buckets": [],
+  "packages": [
+    "bat",
+    "cask:ghostty",
+    "fd",
+    "gh",
+    "ghq",
+    "git",
+    "go",
+    "kotlin",
+    "lazygit",
+    "lua",
+    "neovim",
+    "ripgrep",
+    "tmux",
+    "trash-cli",
+    "tree-sitter-cli",
+    "zsh-autosuggestions",
+    "zsh-completions"
+  ],
+  "ignore": [
+    "cask:font-cascadia-*",
+    "cask:claude-code",
+    "mysql@*",
+    "hashicorp/tap"
+  ]
+}
