@@ -10,7 +10,9 @@ import (
 //
 // Supported: "*", "?", "[...]" (negate with "[^...]"), "\" escapes, "!" to
 // re-include, "#" comments and blank lines. The last matching line wins.
-// Package names contain no "/", so directory rules and "**" do not exist.
+// A name is also ignored when a pattern matches a leading "/"-separated part
+// of it, as in gitignore: "hashicorp/tap" ignores "hashicorp/tap/terraform".
+// Trailing-slash directory rules and "**" do not exist.
 type Ignore struct {
 	rules []ignoreRule
 }
@@ -42,9 +44,24 @@ func parseIgnore(lines []string) (Ignore, error) {
 func (g Ignore) Match(name string) bool {
 	ignored := false
 	for _, r := range g.rules {
-		if ok, _ := path.Match(r.pattern, name); ok {
+		if matchPrefix(r.pattern, name) {
 			ignored = !r.negate
 		}
 	}
 	return ignored
+}
+
+// matchPrefix reports whether pattern matches name or any leading part of it
+// that ends before a "/".
+func matchPrefix(pattern, name string) bool {
+	for {
+		if ok, _ := path.Match(pattern, name); ok {
+			return true
+		}
+		i := strings.LastIndex(name, "/")
+		if i < 0 {
+			return false
+		}
+		name = name[:i]
+	}
 }

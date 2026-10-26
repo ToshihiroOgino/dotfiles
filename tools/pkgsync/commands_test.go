@@ -515,3 +515,40 @@ func TestCommentIsOptionalAndKept(t *testing.T) {
 		t.Errorf("comment lost: %s", b)
 	}
 }
+
+func TestBrewSnapshotAndHints(t *testing.T) {
+	useFake(t, nil, map[string]string{
+		"brew tap":            "hashicorp/tap\n",
+		"brew leaves":         "bat\nhashicorp/tap/terraform\n",
+		"brew list --cask -1": "ghostty\n",
+	})
+	s, err := brew{}.Snapshot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := []string{"bat", "hashicorp/tap/terraform", "cask:ghostty"}; !reflect.DeepEqual(s.Packages, want) {
+		t.Errorf("packages = %v, want %v", s.Packages, want)
+	}
+	if want := []string{"hashicorp/tap"}; !reflect.DeepEqual(s.Buckets, want) {
+		t.Errorf("buckets = %v, want %v", s.Buckets, want)
+	}
+	got := brew{}.InstallHints(Diff{DelPkgs: []string{"bat", "cask:ghostty"}, DelBuckets: []string{"x/y"}})
+	want := []string{"brew tap x/y", "brew install bat", "brew install --cask ghostty"}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("hints = %v, want %v", got, want)
+	}
+}
+
+func TestIgnoreAppliesToBuckets(t *testing.T) {
+	for _, m := range []Manager{scoop{}, brew{}} {
+		d, err := compare(m,
+			Tracked{Buckets: &[]string{"gone"}, Ignore: []string{"extras", "gone"}},
+			Snapshot{Buckets: []string{"main", "extras"}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if want := []string{"main"}; !reflect.DeepEqual(d.AddBuckets, want) || len(d.DelBuckets) != 0 {
+			t.Errorf("%s: add=%v del=%v", m.Name(), d.AddBuckets, d.DelBuckets)
+		}
+	}
+}

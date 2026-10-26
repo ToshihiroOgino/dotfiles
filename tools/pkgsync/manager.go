@@ -26,7 +26,7 @@ type Manager interface {
 }
 
 // detect and output are variables so that tests can substitute them.
-var allManagers = []Manager{apt{}, scoop{}}
+var allManagers = []Manager{apt{}, scoop{}, brew{}}
 
 var detect = func() []Manager {
 	var ms []Manager

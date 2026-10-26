@@ -119,7 +119,8 @@ func compare(m Manager, t Tracked, s Snapshot) (Diff, error) {
 	present := append(append([]string{}, cur...), keep(s.External)...)
 	d.AddPkgs, d.DelPkgs = minus(cur, tr), minus(tr, present)
 	if m.HasBuckets() {
-		tb := t.bucketList()
+		tb := keep(t.bucketList())
+		s.Buckets = keep(s.Buckets)
 		d.AddBuckets, d.DelBuckets = minus(s.Buckets, tb), minus(tb, s.Buckets)
 	}
 	return d, nil
