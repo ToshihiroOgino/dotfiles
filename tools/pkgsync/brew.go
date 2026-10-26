@@ -18,7 +18,7 @@ func (brew) Snapshot() (Snapshot, error) {
 	if err != nil {
 		return Snapshot{}, err
 	}
-	leaves, err := output("brew", "leaves")
+	leaves, err := output("brew", "list", "--formula", "--installed-on-request", "--full-name", "-1")
 	if err != nil {
 		return Snapshot{}, err
 	}

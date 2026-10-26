@@ -518,8 +518,8 @@ func TestCommentIsOptionalAndKept(t *testing.T) {
 
 func TestBrewSnapshotAndHints(t *testing.T) {
 	useFake(t, nil, map[string]string{
-		"brew tap":            "hashicorp/tap\n",
-		"brew leaves":         "bat\nhashicorp/tap/terraform\n",
+		"brew tap": "hashicorp/tap\n",
+		"brew list --formula --installed-on-request --full-name -1": "bat\nhashicorp/tap/terraform\n",
 		"brew list --cask -1": "ghostty\n",
 	})
 	s, err := brew{}.Snapshot()
