@@ -33,7 +33,7 @@ func pollWait(d time.Duration) string {
 // newWait runs once the lock is held and returns the state source: wait blocks
 // for at most d (less if the state changes) and returns the current IME state.
 func runWatch(socket string, newWait func() func(d time.Duration) string) error {
-	name := "imestat-watch"
+	name := "ime-watch"
 	if socket != "" {
 		name += "-" + socket
 	}

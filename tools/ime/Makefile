@@ -3,7 +3,7 @@ LDFLAGS := -s -w
 
 .PHONY: build install clean
 
-# Outputs imestat.exe on Windows, imestat elsewhere.
+# Outputs ime.exe on Windows, ime elsewhere.
 build:
 	go build -trimpath -ldflags "$(LDFLAGS)" .
 

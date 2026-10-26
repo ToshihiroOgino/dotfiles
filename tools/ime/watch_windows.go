@@ -59,7 +59,7 @@ func watch(socket string, serverPID uint32) error {
 
 	// psmux re-runs the config when a warm server is claimed, so a server can
 	// start a second watcher. Keep one per server.
-	_, existed, err := namedMutex(fmt.Sprintf(`Local\imestat-server-%d`, serverPID))
+	_, existed, err := namedMutex(fmt.Sprintf(`Local\ime-server-%d`, serverPID))
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func watch(socket string, serverPID uint32) error {
 		return nil
 	}
 
-	name := `Local\imestat-watch`
+	name := `Local\ime-watch`
 	if socket != "" {
 		name += "-" + socket
 	}
@@ -139,7 +139,7 @@ func detach(socket string, pid uint32) error {
 	if err != nil {
 		return err
 	}
-	args := []string{"--watch", "--server-pid", fmt.Sprint(pid)}
+	args := []string{"watch", "--server-pid", fmt.Sprint(pid)}
 	if socket != "" {
 		args = append(args, "-L", socket)
 	}
