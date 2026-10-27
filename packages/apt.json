@@ -45,6 +45,8 @@
     "util-linux",
     "lib*",
     "!lib*-dev",
-    "google-chrome-stable"
+    "google-chrome-stable",
+    "keepassxc",
+    "syncthing"
   ]
 }
