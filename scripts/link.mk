@@ -37,6 +37,7 @@ link: $(addprefix link-,$(TOOLS_$(PLATFORM)))
 
 link-git:
 	$(LINK) config/git "$(HOME)/.config/git"
+	@[ -e "$(HOME)/.gitconfig" ] || { : >"$(HOME)/.gitconfig" && echo "create   $(HOME)/.gitconfig (empty)"; }
 link-claude:
 	$(LINK) config/claude "$(HOME)/.claude"
 link-tmux:
