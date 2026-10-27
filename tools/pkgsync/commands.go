@@ -138,7 +138,8 @@ func cmdApply(root string, prune bool) error {
 
 // cmdCheck is run in the background at shell startup, so it never fails
 // loudly: errors go to .local/pkgsync.err, which `pkgsync diff` prints.
-func cmdCheck(root string) error {
+// force skips the interval check.
+func cmdCheck(root string, force bool) error {
 	if _, err := os.Stat(root); err != nil {
 		return nil
 	}
@@ -150,7 +151,7 @@ func cmdCheck(root string) error {
 
 	dir := filepath.Join(root, ".local")
 	stamp := filepath.Join(dir, "pkgsync.stamp")
-	if fi, err := os.Stat(stamp); err == nil && time.Since(fi.ModTime()) < checkInterval {
+	if fi, err := os.Stat(stamp); !force && err == nil && time.Since(fi.ModTime()) < checkInterval {
 		return nil
 	}
 	if os.WriteFile(stamp, []byte(time.Now().Format(time.RFC3339)), 0o644) != nil {

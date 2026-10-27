@@ -6,7 +6,7 @@
 //	pkgsync add      add new packages to packages/<mgr>.json
 //	pkgsync sync     add new and drop removed packages
 //	pkgsync check    for shell startup: at most once per 5 minutes, refresh
-//	                 packages/pending/<mgr>.diff
+//	                 packages/pending/<mgr>.diff (-f ignores the interval)
 //	pkgsync help     show the usage
 //
 // Package managers are detected from PATH. pkgsync never touches git and
@@ -30,6 +30,7 @@ commands:
   add    add new packages to the list
   sync   add new packages and drop removed ones
   check  for shell startup: refresh packages/pending/ (once per 5 minutes, silent)
+         check -f refreshes now, ignoring the interval
   help   show this help
 
 The dotfiles root is $PKGSYNC_ROOT, or ~/dotfiles if unset.
@@ -45,8 +46,16 @@ func main() {
 	if flag.NArg() > 0 {
 		cmd = flag.Arg(0)
 	}
-	if flag.NArg() > 1 {
-		fmt.Fprintf(os.Stderr, "pkgsync: unexpected arguments %q\n", flag.Args()[1:])
+	force := false
+	rest := flag.Args()
+	if len(rest) > 0 {
+		rest = rest[1:]
+	}
+	if cmd == "check" && len(rest) == 1 && rest[0] == "-f" {
+		force, rest = true, nil
+	}
+	if len(rest) > 0 {
+		fmt.Fprintf(os.Stderr, "pkgsync: unexpected arguments %q\n", rest)
 		os.Exit(2)
 	}
 
@@ -67,7 +76,7 @@ func main() {
 		case "sync":
 			err = cmdApply(root, true)
 		case "check":
-			err = cmdCheck(root)
+			err = cmdCheck(root, force)
 		default:
 			fmt.Fprintf(os.Stderr, "pkgsync: unknown command %q\n", cmd)
 			flag.Usage()
