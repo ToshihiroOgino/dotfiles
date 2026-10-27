@@ -12,6 +12,7 @@ type Snapshot struct {
 	Packages []string
 	Buckets  []string // only for managers with HasBuckets
 	External []string // installed from outside the repositories; not tracked
+	Initial  []string // installed by the OS installer; not tracked, but present
 	Warnings []string // things to look at; only scoop reports any (Info)
 }
 

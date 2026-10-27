@@ -1,9 +1,61 @@
 package main
 
 import (
+	"bufio"
+	"compress/gzip"
+	"os"
 	"runtime"
 	"strings"
 )
+
+// aptInitialStatus is the dpkg status the installer recorded right after
+// installing the OS. It is a variable so that tests can substitute it.
+var aptInitialStatus = "/var/log/installer/initial-status.gz"
+
+// initialPackages returns the packages installed by the OS installer, as
+// "name" and "name:arch". It returns nil when the file is missing or unreadable.
+func initialPackages() map[string]bool {
+	f, err := os.Open(aptInitialStatus)
+	if err != nil {
+		return nil
+	}
+	defer f.Close()
+	z, err := gzip.NewReader(f)
+	if err != nil {
+		return nil
+	}
+	defer z.Close()
+
+	set := map[string]bool{}
+	var name, arch string
+	installed := false
+	flush := func() {
+		if installed && name != "" {
+			set[name] = true
+			if arch != "" {
+				set[name+":"+arch] = true
+			}
+		}
+		name, arch, installed = "", "", false
+	}
+	sc := bufio.NewScanner(z)
+	sc.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+	for sc.Scan() {
+		l := sc.Text()
+		switch {
+		case l == "":
+			flush()
+		case strings.HasPrefix(l, "Package: "):
+			name = l[len("Package: "):]
+		case strings.HasPrefix(l, "Architecture: "):
+			arch = l[len("Architecture: "):]
+		case strings.HasPrefix(l, "Status: "):
+			installed = strings.HasSuffix(l, " installed")
+		}
+	}
+	flush()
+	return set
+}
 
 type apt struct{}
 
@@ -39,8 +91,13 @@ func (apt) Snapshot() (Snapshot, error) {
 		}
 	}
 
+	initial := initialPackages()
 	var s Snapshot
 	for _, name := range lines(manual) {
+		if initial[name] {
+			s.Initial = append(s.Initial, name)
+			continue
+		}
 		if local[name] {
 			s.External = append(s.External, name)
 		} else {

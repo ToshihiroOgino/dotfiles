@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -58,7 +60,9 @@ func useFake(t *testing.T, ms []Manager, out map[string]string) *fake {
 		return []byte(s), nil
 	}
 	detect = func() []Manager { return ms }
-	t.Cleanup(func() { output, detect = oldOut, oldDetect })
+	oldInit := aptInitialStatus
+	aptInitialStatus = filepath.Join(t.TempDir(), "missing.gz")
+	t.Cleanup(func() { output, detect, aptInitialStatus = oldOut, oldDetect, oldInit })
 	return f
 }
 
@@ -116,6 +120,42 @@ func TestAptSnapshot(t *testing.T) {
 	// the architecture in the third field.
 	if want := []string{"foo-local", "libc6:i386"}; !reflect.DeepEqual(s.External, want) {
 		t.Errorf("External = %q, want %q", s.External, want)
+	}
+}
+
+func TestAptSnapshotSkipsInitial(t *testing.T) {
+	useFake(t, nil, aptCmds())
+	status := "Package: bash\nStatus: install ok installed\nArchitecture: amd64\n\n" +
+		"Package: bat\nStatus: deinstall ok config-files\nArchitecture: amd64\n\n" +
+		"Package: libc6\nStatus: install ok installed\nArchitecture: i386\n"
+	var buf bytes.Buffer
+	z := gzip.NewWriter(&buf)
+	z.Write([]byte(status))
+	z.Close()
+	if err := os.WriteFile(aptInitialStatus, buf.Bytes(), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	s, err := apt{}.Snapshot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	// bash is dropped; bat was only config-files, so it stays.
+	if want := []string{"bat", "libfoo", "zsh"}; !reflect.DeepEqual(s.Packages, want) {
+		t.Errorf("Packages = %q, want %q", s.Packages, want)
+	}
+	if want := []string{"foo-local"}; !reflect.DeepEqual(s.External, want) {
+		t.Errorf("External = %q, want %q", s.External, want)
+	}
+	if want := []string{"bash", "libc6:i386"}; !reflect.DeepEqual(s.Initial, want) {
+		t.Errorf("Initial = %q, want %q", s.Initial, want)
+	}
+	// A tracked package that is only present as initial is not a removal.
+	d, err := compare(apt{}, Tracked{Packages: []string{"bash", "zsh"}}, s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(d.DelPkgs) != 0 {
+		t.Errorf("DelPkgs = %q, want none", d.DelPkgs)
 	}
 }
 

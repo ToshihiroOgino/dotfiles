@@ -116,7 +116,9 @@ func compare(m Manager, t Tracked, s Snapshot) (Diff, error) {
 	cur, tr := keep(s.Packages), keep(t.Packages)
 	// A tracked package that is installed from outside the repositories (a
 	// local .deb, a URL manifest) is still installed: not a removal.
+	// Likewise for packages the OS installer put there.
 	present := append(append([]string{}, cur...), keep(s.External)...)
+	present = append(present, keep(s.Initial)...)
 	d.AddPkgs, d.DelPkgs = minus(cur, tr), minus(tr, present)
 	if m.HasBuckets() {
 		tb := keep(t.bucketList())

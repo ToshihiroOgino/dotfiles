@@ -1,5 +1,4 @@
 {
-  "comment": "",
   "packages": [
     "bat",
     "build-essential",
@@ -21,8 +20,10 @@
     "ninja-build",
     "npm",
     "ripgrep",
+    "tmux",
     "trash-cli",
     "tree-sitter-cli",
+    "vim",
     "zip",
     "zsh"
   ],
@@ -43,6 +44,7 @@
     "tar",
     "util-linux",
     "lib*",
-    "!lib*-dev"
+    "!lib*-dev",
+    "google-chrome-stable"
   ]
 }
