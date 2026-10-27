@@ -12,3 +12,5 @@
 	rebase = true
 [rebase]
 	rautoStash = true
+[include]
+	path = ~/.gitconfig
