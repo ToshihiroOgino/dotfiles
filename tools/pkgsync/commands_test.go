@@ -233,7 +233,7 @@ func TestIgnoredTrackedEntryIsNotReportedRemoved(t *testing.T) {
 		Packages: []string{"bash", "bat", "libfoo", "ubuntu-minimal", "zsh"},
 		Ignore:   []string{"ubuntu-*"},
 	})
-	if err := cmdCheck(root); err != nil {
+	if err := cmdCheck(root, false); err != nil {
 		t.Fatal(err)
 	}
 	if got := pending(root, "summary"); got != "<none>" {
@@ -269,7 +269,7 @@ func TestSummaryCombinesManagers(t *testing.T) {
 	cmds := aptCmds()
 	cmds["scoop export"] = scoopOut
 	useFake(t, []Manager{apt{}, scoop{}}, cmds)
-	if err := cmdCheck(root); err != nil {
+	if err := cmdCheck(root, false); err != nil {
 		t.Fatal(err)
 	}
 	// apt: 4 packages; scoop: 2 buckets + 2 apps, and 1 warning.
@@ -282,7 +282,7 @@ func TestCheckThrottle(t *testing.T) {
 	root := t.TempDir()
 	f := useFake(t, []Manager{apt{}}, aptCmds())
 
-	if err := cmdCheck(root); err != nil {
+	if err := cmdCheck(root, false); err != nil {
 		t.Fatal(err)
 	}
 	first := f.calls
@@ -290,18 +290,26 @@ func TestCheckThrottle(t *testing.T) {
 		t.Fatal("first check ran no command")
 	}
 
-	if err := cmdCheck(root); err != nil {
+	if err := cmdCheck(root, false); err != nil {
 		t.Fatal(err)
 	}
 	if f.calls != first {
 		t.Errorf("check within the interval ran %d more commands", f.calls-first)
 	}
 
+	if err := cmdCheck(root, true); err != nil {
+		t.Fatal(err)
+	}
+	if f.calls != 2*first {
+		t.Errorf("forced check ran %d commands, want %d", f.calls-first, first)
+	}
+	f.calls = first
+
 	old := time.Now().Add(-2 * checkInterval)
 	if err := os.Chtimes(filepath.Join(root, ".local", "pkgsync.stamp"), old, old); err != nil {
 		t.Fatal(err)
 	}
-	if err := cmdCheck(root); err != nil {
+	if err := cmdCheck(root, false); err != nil {
 		t.Fatal(err)
 	}
 	if f.calls != 2*first {
@@ -320,7 +328,7 @@ func TestCheckIsSilentOnFailure(t *testing.T) {
 	f := useFake(t, []Manager{apt{}}, aptCmds())
 	f.fail = true
 
-	if err := cmdCheck(root); err != nil {
+	if err := cmdCheck(root, false); err != nil {
 		t.Fatalf("check must not fail: %v", err)
 	}
 	errFile := filepath.Join(root, ".local", "pkgsync.err")
@@ -333,7 +341,7 @@ func TestCheckIsSilentOnFailure(t *testing.T) {
 	f.fail = false
 	old := time.Now().Add(-2 * checkInterval)
 	os.Chtimes(filepath.Join(root, ".local", "pkgsync.stamp"), old, old)
-	if err := cmdCheck(root); err != nil {
+	if err := cmdCheck(root, false); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := os.Stat(errFile); err == nil {
@@ -371,7 +379,7 @@ func TestApplyFailsWhileLocked(t *testing.T) {
 		t.Error("apt.json written while locked")
 	}
 	// check just returns.
-	if err := cmdCheck(root); err != nil {
+	if err := cmdCheck(root, false); err != nil {
 		t.Fatal(err)
 	}
 	if got := pending(root, "summary"); got != "<none>" {
