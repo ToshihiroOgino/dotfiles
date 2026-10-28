@@ -7,7 +7,9 @@
 //	                            leaves the prefix key table, then restore the mode
 //	ime watch [-L s]         stay resident and push the mode into the tmux
 //	                            user option @ime of every session, only when it
-//	                            changes (see tools/ime/README.md)
+//	                            changes; on Linux and macOS it also runs the
+//	                            prefix sessions that `ime prefix` hands over
+//	                            (see tools/ime/README.md)
 //
 // On unsupported platforms nothing is printed to stdout; a message goes to
 // stderr and the exit code is 1.
@@ -45,7 +47,11 @@ func main() {
 		if fs.NArg() != 1 {
 			err = fmt.Errorf("usage: ime prefix [-L socket] client")
 		} else {
-			prefixSession(*socket, fs.Arg(0))
+			// A running watcher does the work if there is one; it keeps a
+			// single tmux connection instead of starting tmux per poll.
+			if !notifyDaemon(*socket, fs.Arg(0)) {
+				prefixSession(fs.Arg(0), spawnTable(tmuxClient{socket: *socket}))
+			}
 		}
 	case "watch":
 		fs := flag.NewFlagSet("watch", flag.ExitOnError)
