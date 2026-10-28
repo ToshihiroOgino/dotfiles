@@ -7,7 +7,7 @@ After=graphical-session.target
 ExecStart=/usr/bin/fcitx5 --disable=wayland,waylandim
 Environment=DISPLAY=:0
 Environment=WAYLAND_DISPLAY=wayland-0
-Restart=on-failure
+Restart=always
 
 [Install]
 WantedBy=default.target
