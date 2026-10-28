@@ -5,7 +5,6 @@ _pkgsync_root=${PKGSYNC_ROOT:-$HOME/dotfiles}
 export PKGSYNC_ROOT=$_pkgsync_root
 _pkgsync_bin=$_pkgsync_root/tools/pkgsync/pkgsync
 [[ -x $_pkgsync_bin ]] || return 0
-alias pkgsync=$_pkgsync_bin
 
 # The subshell keeps zsh from printing a job number.
 ( "$_pkgsync_bin" diff --throttle >/dev/null 2>&1 & )

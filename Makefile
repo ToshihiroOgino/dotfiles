@@ -7,13 +7,19 @@ all: tools link external systemd-enable
 
 .PHONY: all ime pkgsync systemd-enable external nvim tree-sitter omz claude
 
+# Built tools are linked into BIN, which is on PATH.
+BIN := $(HOME)/.local/bin
+EXE := $(if $(filter windows,$(FAMILY)),.exe)
+
 tools: ime pkgsync
 
 ime:
 	"$(MAKE)" -C tools/ime build
+	$(LINK) tools/ime/ime$(EXE) "$(BIN)/ime$(EXE)"
 
 pkgsync:
 	"$(MAKE)" -C tools/pkgsync build
+	$(LINK) tools/pkgsync/pkgsync$(EXE) "$(BIN)/pkgsync$(EXE)"
 
 systemd-enable:
 	@sh $(SCRIPTS)systemd-enable.sh
