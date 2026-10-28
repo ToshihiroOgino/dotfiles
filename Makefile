@@ -3,9 +3,9 @@
 include scripts/env.mk
 include scripts/link.mk
 
-all: tools link systemd-enable
+all: tools link external systemd-enable
 
-.PHONY: all ime pkgsync systemd-enable
+.PHONY: all ime pkgsync systemd-enable external nvim omz claude
 
 tools: ime pkgsync
 
@@ -17,3 +17,14 @@ pkgsync:
 
 systemd-enable:
 	@sh $(SCRIPTS)systemd-enable.sh
+
+external: nvim omz claude
+
+nvim:
+	@sh external/nvim.sh
+
+claude:
+	@sh external/claude.sh
+
+omz:
+	@if [ "$(PLATFORM)" != windows ]; then sh external/oh-my-zsh.sh; fi
