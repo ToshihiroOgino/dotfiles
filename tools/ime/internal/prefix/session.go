@@ -1,9 +1,12 @@
-package main
+// Package prefix switches the IME to alphanumeric input while the tmux prefix
+// key table is active, and restores it afterwards.
+package prefix
 
 import (
 	"time"
 
 	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/imectl"
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/tmuxctl"
 )
 
 const (
@@ -12,7 +15,7 @@ const (
 	prefixMaxHold = 10 * time.Minute // give up waiting for the prefix sequence to finish
 )
 
-// prefixSession switches the IME to alphanumeric input while client sits in
+// Session switches the IME to alphanumeric input while client sits in
 // tmux's prefix key table, then restores the previous input source. It is
 // meant to be started by the C-b binding next to `switch-client -T prefix`, so
 // the prefix table may not be entered yet when it starts.
@@ -20,7 +23,7 @@ const (
 // It never fails: run-shell would show any output or non-zero exit in the
 // pane on every prefix press, which is worse than a missing IME switch (e.g.
 // when no IME tool is installed).
-func prefixSession(client string, table func(client string) (string, error)) {
+func Session(client string, table tmuxctl.TableFunc) {
 	prev, err := imectl.Save()
 	if err != nil {
 		return

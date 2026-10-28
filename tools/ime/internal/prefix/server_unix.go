@@ -1,6 +1,6 @@
 //go:build darwin || linux
 
-package main
+package prefix
 
 import (
 	"bufio"
@@ -18,14 +18,6 @@ import (
 
 	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/tmuxctl"
 )
-
-// watchName names the lock and the socket of the watcher for a tmux socket.
-func watchName(socket string) string {
-	if socket == "" {
-		return "ime-watch"
-	}
-	return "ime-watch-" + socket
-}
 
 // socketDir returns a directory only this user can use: $XDG_RUNTIME_DIR, or
 // a private one under the temporary directory. The socket must not sit in a
@@ -53,21 +45,25 @@ func ownedByMe(fi os.FileInfo) bool {
 	return ok && int(st.Uid) == os.Getuid()
 }
 
-func prefixSocketPath(socket string) (string, error) {
+func socketPath(socket string) (string, error) {
 	d, err := socketDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(d, watchName(socket)+".sock"), nil
+	name := "ime-prefix"
+	if socket != "" {
+		name += "-" + socket
+	}
+	return filepath.Join(d, name+".sock"), nil
 }
 
-// servePrefix accepts `ime prefix` requests on a Unix socket and runs the
+// Serve accepts `ime prefix` requests on a Unix socket and runs the
 // prefix sessions in this process, over one tmux control connection. It must
 // be called with the watcher lock held, which makes removing a stale socket
 // safe. The returned func stops it: running sessions end first, so that they
 // restore the IME.
-func servePrefix(socket string) (stop func()) {
-	path, err := prefixSocketPath(socket)
+func Serve(socket string) (stop func()) {
+	path, err := socketPath(socket)
 	if err != nil {
 		return func() {} // `ime prefix` then runs the session by itself
 	}
@@ -100,7 +96,7 @@ func servePrefix(socket string) (stop func()) {
 				line, err := bufio.NewReader(conn).ReadString('\n')
 				conn.Close()
 				if client := strings.TrimSpace(line); err == nil && client != "" {
-					prefixSession(client, table)
+					Session(client, table)
 				}
 			}()
 		}
@@ -118,10 +114,10 @@ func servePrefix(socket string) (stop func()) {
 	}
 }
 
-// notifyDaemon hands the prefix session of client to the running watcher. It
+// Notify hands the prefix session of client to the running watcher. It
 // reports false when there is none, and the caller does the work itself.
-func notifyDaemon(socket, client string) bool {
-	path, err := prefixSocketPath(socket)
+func Notify(socket, client string) bool {
+	path, err := socketPath(socket)
 	if err != nil {
 		return false
 	}

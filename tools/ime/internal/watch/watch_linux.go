@@ -1,6 +1,6 @@
 //go:build linux
 
-package main
+package watch
 
 import (
 	"bufio"
@@ -15,13 +15,13 @@ import (
 	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/imectl"
 )
 
-// watch follows fcitx5's CurrentIM signal through a resident dbus-monitor, so
+// Run follows fcitx5's CurrentIM signal through a resident dbus-monitor, so
 // nothing runs while the input method stays the same. Every sessionInterval
 // without a signal the state is read once more with fcitx5-remote, which
 // covers changes made while dbus-monitor was starting or down.
 //
 // serverPID is only used on Windows and ignored here.
-func watch(socket string, _ uint32) error {
+func Run(socket string, _ uint32) error {
 	return runWatch(socket, func() func(time.Duration) string {
 		return newSignalSource().wait
 	})

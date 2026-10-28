@@ -1,6 +1,6 @@
 //go:build darwin || linux
 
-package main
+package watch
 
 import (
 	"fmt"
@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/imectl"
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/prefix"
 	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/tmuxctl"
 )
 
@@ -35,7 +36,10 @@ func pollWait(d time.Duration) string {
 // newWait runs once the lock is held and returns the state source: wait blocks
 // for at most d (less if the state changes) and returns the current IME state.
 func runWatch(socket string, newWait func() func(d time.Duration) string) error {
-	name := watchName(socket)
+	name := "ime-watch"
+	if socket != "" {
+		name += "-" + socket
+	}
 	lock, err := os.OpenFile(filepath.Join(os.TempDir(), name+".lock"), os.O_CREATE|os.O_RDWR, 0o600)
 	if err != nil {
 		return err
@@ -45,7 +49,7 @@ func runWatch(socket string, newWait func() func(d time.Duration) string) error 
 		return fmt.Errorf("flock: %w", err)
 	}
 
-	defer servePrefix(socket)()
+	defer prefix.Serve(socket)()
 	wait := newWait()
 	tmux := tmuxctl.Client{Socket: socket}
 	var last string

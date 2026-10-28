@@ -1,12 +1,12 @@
 //go:build !windows && !darwin && !linux
 
-package main
+package watch
 
 import (
 	"fmt"
 	"runtime"
 )
 
-func watch(string, uint32) error {
+func Run(string, uint32) error {
 	return fmt.Errorf("watch not supported on %s", runtime.GOOS)
 }

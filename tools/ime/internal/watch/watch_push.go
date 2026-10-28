@@ -1,4 +1,4 @@
-package main
+package watch
 
 import "github.com/ToshihiroOgino/dotfiles/tools/ime/internal/tmuxctl"
 

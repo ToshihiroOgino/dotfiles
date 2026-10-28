@@ -1,6 +1,6 @@
 //go:build windows
 
-package main
+package watch
 
 import (
 	"fmt"
@@ -38,7 +38,7 @@ var (
 // serverNames are the executables psmux runs its server as.
 var serverNames = map[string]bool{"tmux.exe": true, "psmux.exe": true, "pmux.exe": true}
 
-// watch runs one resident watcher per socket. Every psmux server starts one
+// Run runs one resident watcher per socket. Every psmux server starts one
 // (run-shell -b in tmux.conf); a named mutex lets exactly one of them work
 // while the others wait to take over. Each exits when its own server exits,
 // because psmux does not kill run-shell -b children on kill-server.
@@ -46,7 +46,7 @@ var serverNames = map[string]bool{"tmux.exe": true, "psmux.exe": true, "pmux.exe
 // psmux starts run-shell commands through `pwsh -Command`, and that pwsh
 // (~75 MB) would live as long as we do. So the first invocation locates its
 // server, re-launches itself detached with --server-pid, and exits at once.
-func watch(socket string, serverPID uint32) error {
+func Run(socket string, serverPID uint32) error {
 	if serverPID == 0 {
 		// Without a server to follow nothing would ever stop us, e.g. when a
 		// server dies while its config is still running. Refuse instead.
