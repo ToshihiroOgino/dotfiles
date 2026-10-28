@@ -15,7 +15,7 @@ make link            # link all configs for this OS
 make ime        # build ime
 make pkgsync         # build pkgsync
 make systemd-enable  # WSL only: enable systemd units
-make external        # nvim (pinned tarball), oh-my-zsh (shallow clone), claude (official installer)
+make external        # nvim and tree-sitter (pinned releases), oh-my-zsh (shallow clone), claude (official installer)
 ```
 
 ## Tools

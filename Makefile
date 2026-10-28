@@ -5,7 +5,7 @@ include scripts/link.mk
 
 all: tools link external systemd-enable
 
-.PHONY: all ime pkgsync systemd-enable external nvim omz claude
+.PHONY: all ime pkgsync systemd-enable external nvim tree-sitter omz claude
 
 tools: ime pkgsync
 
@@ -18,10 +18,13 @@ pkgsync:
 systemd-enable:
 	@sh $(SCRIPTS)systemd-enable.sh
 
-external: nvim omz claude
+external: nvim tree-sitter omz claude
 
 nvim:
 	@sh external/nvim.sh
+
+tree-sitter:
+	@sh external/tree-sitter.sh
 
 claude:
 	@sh external/claude.sh
