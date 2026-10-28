@@ -54,7 +54,7 @@ else
   # The archive holds a single top-level directory.
   rm -rf "$DEST"
   mkdir -p "$(dirname "$DEST")"
-  mv"$tmp"/x/* "$DEST"
+  mv "$tmp"/x/* "$DEST"
   echo "install  $DEST (v$VERSION)"
 fi
 
