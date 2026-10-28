@@ -16,15 +16,3 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = args.buf, desc = "Definition" })
   end,
 })
-
-vim.keymap.set("i", "<M-i>", function()
-  vim.o.autocomplete = not vim.o.autocomplete
-  vim.notify("autocomplete: " .. (vim.o.autocomplete and "on" or "off"))
-end, { desc = "Toggle autocomplete" })
-
-vim.keymap.set("i", "<Tab>", function()
-  return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>"
-end, { expr = true, desc = "Next completion or Tab" })
-vim.keymap.set("i", "<S-Tab>", function()
-  return vim.fn.pumvisible() == 1 and "<C-p>" or "<S-Tab>"
-end, { expr = true, desc = "Previous completion or S-Tab" })
