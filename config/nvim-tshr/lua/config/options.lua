@@ -7,3 +7,9 @@ if vim.fn.filereadable(vimrc) == 1 then
 end
 
 vim.o.fileformat = "unix"
+
+-- Tree-sitter でフォールドする。foldcolumn をクリックで開閉できる
+vim.o.foldmethod = "expr"
+vim.o.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.o.foldcolumn = "1"
+vim.o.foldlevelstart = 99
