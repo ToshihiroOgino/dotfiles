@@ -9,7 +9,7 @@ LINK := sh $(SCRIPTS)link.sh
 # For machine-local files: created from templates/ when missing.
 LINK_LOCAL := $(LINK) --local
 
-COMMON        := git claude tmux nvim vim lazygit alacritty herdr
+COMMON        := git claude tmux nvim nvim-tshr vim lazygit alacritty herdr
 TOOLS_wsl     := $(COMMON) ghostty wsl zsh
 TOOLS_linux   := $(COMMON) ghostty zsh
 TOOLS_mac     := $(COMMON) ghostty zsh
@@ -34,6 +34,12 @@ NVIM_unix    := $(HOME)/.config/nvim
 NVIM_windows := $(LOCALAPPDATA)/nvim
 link-nvim:
 	$(LINK) config/nvim "$(NVIM_$(FAMILY))"
+
+# NVIM_APPNAME=nvim-tshr (alias `v`): the from-scratch config that will replace nvim.
+NVIM_TSHR_unix    := $(HOME)/.config/nvim-tshr
+NVIM_TSHR_windows := $(LOCALAPPDATA)/nvim-tshr
+link-nvim-tshr:
+	$(LINK) config/nvim-tshr "$(NVIM_TSHR_$(FAMILY))"
 
 link-zsh:
 	$(LINK) config/zsh/zshrc "$(HOME)/.zshrc"
