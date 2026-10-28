@@ -1,0 +1,27 @@
+#compdef ime
+
+local state
+local -a commands=(
+  'get:print the IME mode (ja or en)'
+  'set:switch the IME mode'
+  'prefix:alphanumeric input while the tmux prefix is active'
+  'watch:keep the tmux @ime option updated'
+)
+
+_arguments -C \
+  '1: :->command' \
+  '*:: :->args' && return
+
+case $state in
+command)
+  _describe -t commands command commands
+  ;;
+args)
+  case $words[1] in
+  get) _arguments '-s[print the symbols instead of ja/en]' ;;
+  set) _arguments '1:mode:(en ja)' ;;
+  prefix) _arguments '-L[tmux socket name]:socket' '1:tmux client' ;;
+  watch) _arguments '-L[tmux socket name]:socket' ;;
+  esac
+  ;;
+esac

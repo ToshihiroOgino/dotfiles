@@ -2,6 +2,9 @@
 _pkgsync_zsh="${PKGSYNC_ROOT:-$HOME/dotfiles}/tools/pkgsync/pkgsync.zsh"
 [[ -r $_pkgsync_zsh ]] && source "$_pkgsync_zsh"
 
+# Completions for the tools in this repo; must be on fpath before compinit runs.
+fpath=("${${(%):-%x}:A:h}/completions" $fpath)
+
 ZSH_THEME="eastwood"
 DISABLE_UNTRACKED_FILES_DIRTY="true"
 HIST_STAMPS="yyyy/mm/dd"
@@ -17,6 +20,7 @@ export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 
 alias bat=batcat
 alias rm=trash
+alias v='NVIM_APPNAME=nvim-tshr nvim'
 
 export CMAKE_GENERATOR=Ninja
 export BAT_PAGER="less -RF --mouse"

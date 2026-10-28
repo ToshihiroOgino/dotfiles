@@ -1,7 +1,10 @@
 set relativenumber
+set signcolumn=yes
 set fileformats=unix,dos
 set wrap
 set tabstop=2
+set shiftwidth=0
+set softtabstop=-1
 set noswapfile
 set nobackup
 set nowritebackup
