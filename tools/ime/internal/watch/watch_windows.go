@@ -24,7 +24,6 @@ const (
 	infinite       = 0xFFFFFFFF // INFINITE
 	waitObject0    = 0x00000000 // WAIT_OBJECT_0
 	waitAbandoned0 = 0x00000080 // WAIT_ABANDONED_0
-	createNoWindow = 0x08000000 // CREATE_NO_WINDOW
 	detached       = 0x00000008 // DETACHED_PROCESS
 	newProcGroup   = 0x00000200 // CREATE_NEW_PROCESS_GROUP
 )

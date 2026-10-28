@@ -3,7 +3,9 @@ package tmuxctl
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -77,6 +79,9 @@ func (c *ctlConn) read(r io.Reader) {
 		case strings.HasPrefix(l, "%exit"):
 			return
 		}
+	}
+	if err := sc.Err(); err != nil {
+		fmt.Fprintln(os.Stderr, "ime: tmux control connection:", err)
 	}
 }
 

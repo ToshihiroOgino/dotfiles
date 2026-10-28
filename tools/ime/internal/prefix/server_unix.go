@@ -57,19 +57,29 @@ func socketPath(socket string) (string, error) {
 	return filepath.Join(d, name+".sock"), nil
 }
 
+// maxSocketPath is below the shortest sun_path (104 bytes on macOS, 108 on
+// Linux), counting the terminating NUL.
+const maxSocketPath = 104
+
 // Serve accepts `ime prefix` requests on a Unix socket and runs the
 // prefix sessions in this process, over one tmux control connection. It must
 // be called with the watcher lock held, which makes removing a stale socket
 // safe. The returned func stops it: running sessions end first, so that they
 // restore the IME.
 func Serve(socket string) (stop func()) {
+	// Without a socket, `ime prefix` runs the session by itself.
 	path, err := socketPath(socket)
+	if err == nil && len(path) >= maxSocketPath {
+		err = fmt.Errorf("%s is too long for a Unix socket", path)
+	}
 	if err != nil {
-		return func() {} // `ime prefix` then runs the session by itself
+		fmt.Fprintln(os.Stderr, "ime: prefix sessions run per key press:", err)
+		return func() {}
 	}
 	os.Remove(path)
 	l, err := net.Listen("unix", path)
 	if err != nil {
+		fmt.Fprintln(os.Stderr, "ime: prefix sessions run per key press:", err)
 		return func() {}
 	}
 	pool := &tmuxctl.Pool{Socket: socket}
@@ -82,7 +92,9 @@ func Serve(socket string) (stop func()) {
 		return lookup(client)
 	}
 	var sessions sync.WaitGroup
+	accepted := make(chan struct{}) // closed when no more sessions can start
 	go func() {
+		defer close(accepted)
 		for {
 			conn, err := l.Accept()
 			if err != nil {
@@ -102,7 +114,8 @@ func Serve(socket string) (stop func()) {
 		}
 	}()
 	return func() {
-		l.Close() // also removes the socket file
+		l.Close()  // also removes the socket file
+		<-accepted // sessions.Add must not run while Wait does
 		closing.Store(true)
 		done := make(chan struct{})
 		go func() { sessions.Wait(); close(done) }()

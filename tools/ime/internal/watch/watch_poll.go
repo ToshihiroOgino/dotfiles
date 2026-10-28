@@ -28,6 +28,26 @@ func pollWait(d time.Duration) string {
 	return state
 }
 
+// openLock opens the lock file next to the executable, which is private to
+// the user who installed it; the shared temporary directory is only the
+// fallback for an executable in a read-only place. All watchers of one
+// executable therefore use the same file.
+func openLock(name string) (*os.File, error) {
+	var dirs []string
+	if exe, err := os.Executable(); err == nil {
+		dirs = append(dirs, filepath.Dir(exe))
+	}
+	dirs = append(dirs, os.TempDir())
+	var err error
+	for _, d := range dirs {
+		var f *os.File
+		if f, err = os.OpenFile(filepath.Join(d, name+".lock"), os.O_CREATE|os.O_RDWR, 0o600); err == nil {
+			return f, nil
+		}
+	}
+	return nil, err
+}
+
 // runWatch runs one resident watcher per socket. tmux runs `run-shell -b` once
 // per server start, so a file lock keeps a leftover watcher of a previous
 // server from running alongside the new one: the new watcher waits for the
@@ -40,7 +60,7 @@ func runWatch(socket string, newWait func() func(d time.Duration) string) error 
 	if socket != "" {
 		name += "-" + socket
 	}
-	lock, err := os.OpenFile(filepath.Join(os.TempDir(), name+".lock"), os.O_CREATE|os.O_RDWR, 0o600)
+	lock, err := openLock(name)
 	if err != nil {
 		return err
 	}

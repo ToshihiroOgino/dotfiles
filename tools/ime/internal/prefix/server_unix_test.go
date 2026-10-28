@@ -4,6 +4,7 @@ package prefix
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -43,5 +44,14 @@ func TestSocketDirIsPrivateWithoutXDG(t *testing.T) {
 	fi, err := os.Stat(d)
 	if err != nil || fi.Mode().Perm()&0o077 != 0 {
 		t.Errorf("%s: %v, mode %v", d, err, fi.Mode())
+	}
+}
+
+func TestServeWithTooLongPathFallsBack(t *testing.T) {
+	t.Setenv("XDG_RUNTIME_DIR", t.TempDir())
+	stop := Serve(strings.Repeat("x", 120))
+	stop() // a no-op, and it must not panic
+	if Notify(strings.Repeat("x", 120), "client-1") {
+		t.Error("Notify succeeded without a server")
 	}
 }
