@@ -24,3 +24,22 @@ vim.o.foldmethod = "expr"
 vim.o.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.o.foldcolumn = "1"
 vim.o.foldlevelstart = 99
+
+-- Share the clipboard with the outside through OSC 52 (works over Ghostty and tmux).
+-- Paste reads from the register instead of querying the terminal, which would prompt.
+vim.o.clipboard = "unnamedplus"
+vim.g.clipboard = {
+	name = "OSC 52",
+	copy = {
+		["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+		["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+	},
+	paste = {
+		["+"] = function()
+			return { vim.fn.split(vim.fn.getreg(""), "\n"), vim.fn.getregtype("") }
+		end,
+		["*"] = function()
+			return { vim.fn.split(vim.fn.getreg(""), "\n"), vim.fn.getregtype("") }
+		end,
+	},
+}
