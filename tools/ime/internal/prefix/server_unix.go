@@ -1,6 +1,6 @@
 //go:build darwin || linux
 
-package main
+package prefix
 
 import (
 	"bufio"
@@ -15,15 +15,9 @@ import (
 	"sync/atomic"
 	"syscall"
 	"time"
-)
 
-// watchName names the lock and the socket of the watcher for a tmux socket.
-func watchName(socket string) string {
-	if socket == "" {
-		return "ime-watch"
-	}
-	return "ime-watch-" + socket
-}
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/tmuxctl"
+)
 
 // socketDir returns a directory only this user can use: $XDG_RUNTIME_DIR, or
 // a private one under the temporary directory. The socket must not sit in a
@@ -51,31 +45,45 @@ func ownedByMe(fi os.FileInfo) bool {
 	return ok && int(st.Uid) == os.Getuid()
 }
 
-func prefixSocketPath(socket string) (string, error) {
+func socketPath(socket string) (string, error) {
 	d, err := socketDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(d, watchName(socket)+".sock"), nil
+	name := "ime-prefix"
+	if socket != "" {
+		name += "-" + socket
+	}
+	return filepath.Join(d, name+".sock"), nil
 }
 
-// servePrefix accepts `ime prefix` requests on a Unix socket and runs the
+// maxSocketPath is below the shortest sun_path (104 bytes on macOS, 108 on
+// Linux), counting the terminating NUL.
+const maxSocketPath = 104
+
+// Serve accepts `ime prefix` requests on a Unix socket and runs the
 // prefix sessions in this process, over one tmux control connection. It must
 // be called with the watcher lock held, which makes removing a stale socket
 // safe. The returned func stops it: running sessions end first, so that they
 // restore the IME.
-func servePrefix(socket string) (stop func()) {
-	path, err := prefixSocketPath(socket)
+func Serve(socket string) (stop func()) {
+	// Without a socket, `ime prefix` runs the session by itself.
+	path, err := socketPath(socket)
+	if err == nil && len(path) >= maxSocketPath {
+		err = fmt.Errorf("%s is too long for a Unix socket", path)
+	}
 	if err != nil {
-		return func() {} // `ime prefix` then runs the session by itself
+		fmt.Fprintln(os.Stderr, "ime: prefix sessions run per key press:", err)
+		return func() {}
 	}
 	os.Remove(path)
 	l, err := net.Listen("unix", path)
 	if err != nil {
+		fmt.Fprintln(os.Stderr, "ime: prefix sessions run per key press:", err)
 		return func() {}
 	}
-	pool := &ctlPool{socket: socket}
-	lookup := pool.table(spawnTable(tmuxClient{socket: socket}))
+	pool := &tmuxctl.Pool{Socket: socket}
+	lookup := pool.Table(tmuxctl.SpawnTable(tmuxctl.Client{Socket: socket}))
 	var closing atomic.Bool
 	table := func(client string) (string, error) {
 		if closing.Load() {
@@ -84,7 +92,9 @@ func servePrefix(socket string) (stop func()) {
 		return lookup(client)
 	}
 	var sessions sync.WaitGroup
+	accepted := make(chan struct{}) // closed when no more sessions can start
 	go func() {
+		defer close(accepted)
 		for {
 			conn, err := l.Accept()
 			if err != nil {
@@ -98,13 +108,14 @@ func servePrefix(socket string) (stop func()) {
 				line, err := bufio.NewReader(conn).ReadString('\n')
 				conn.Close()
 				if client := strings.TrimSpace(line); err == nil && client != "" {
-					prefixSession(client, table)
+					Session(client, table)
 				}
 			}()
 		}
 	}()
 	return func() {
-		l.Close() // also removes the socket file
+		l.Close()  // also removes the socket file
+		<-accepted // sessions.Add must not run while Wait does
 		closing.Store(true)
 		done := make(chan struct{})
 		go func() { sessions.Wait(); close(done) }()
@@ -112,14 +123,14 @@ func servePrefix(socket string) (stop func()) {
 		case <-done:
 		case <-time.After(2 * time.Second):
 		}
-		pool.close()
+		pool.Close()
 	}
 }
 
-// notifyDaemon hands the prefix session of client to the running watcher. It
+// Notify hands the prefix session of client to the running watcher. It
 // reports false when there is none, and the caller does the work itself.
-func notifyDaemon(socket, client string) bool {
-	path, err := prefixSocketPath(socket)
+func Notify(socket, client string) bool {
+	path, err := socketPath(socket)
 	if err != nil {
 		return false
 	}

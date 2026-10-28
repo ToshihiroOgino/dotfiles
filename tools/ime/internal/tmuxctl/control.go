@@ -1,11 +1,11 @@
-//go:build darwin || linux
-
-package main
+package tmuxctl
 
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -13,7 +13,10 @@ import (
 	"time"
 )
 
-const ctlTimeout = 2 * time.Second
+const (
+	ctlTimeout     = 2 * time.Second
+	redialInterval = 2 * time.Second // between attempts to connect to tmux
+)
 
 // tmuxError is an error that tmux reported for a command, as opposed to a
 // broken connection.
@@ -76,6 +79,9 @@ func (c *ctlConn) read(r io.Reader) {
 		case strings.HasPrefix(l, "%exit"):
 			return
 		}
+	}
+	if err := sc.Err(); err != nil {
+		fmt.Fprintln(os.Stderr, "ime: tmux control connection:", err)
 	}
 }
 
@@ -160,10 +166,10 @@ func dialControl(socket string) (*ctlConn, error) {
 	return c, nil
 }
 
-// ctlPool keeps one control connection, reconnecting lazily. Without one,
+// Pool keeps one control connection, reconnecting lazily. Without one,
 // callers fall back to starting tmux.
-type ctlPool struct {
-	socket  string
+type Pool struct {
+	Socket  string // tmux socket name for -L; the default socket if empty
 	mu      sync.Mutex
 	c       *ctlConn
 	dialing bool
@@ -172,7 +178,7 @@ type ctlPool struct {
 
 // get returns the live connection, or nil. It never waits for a dial that
 // another caller is making: that caller's poll is slow enough already.
-func (p *ctlPool) get() *ctlConn {
+func (p *Pool) get() *ctlConn {
 	p.mu.Lock()
 	if p.c != nil && p.c.alive() {
 		defer p.mu.Unlock()
@@ -180,7 +186,7 @@ func (p *ctlPool) get() *ctlConn {
 	}
 	if p.c != nil {
 		p.c = nil
-		p.retry = time.Now().Add(sessionInterval) // it died: do not redial at once
+		p.retry = time.Now().Add(redialInterval) // it died: do not redial at once
 	}
 	if p.dialing || time.Now().Before(p.retry) {
 		p.mu.Unlock()
@@ -189,20 +195,21 @@ func (p *ctlPool) get() *ctlConn {
 	p.dialing = true
 	p.mu.Unlock()
 
-	c, err := dialControl(p.socket)
+	c, err := dialControl(p.Socket)
 
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.dialing = false
 	if err != nil {
-		p.retry = time.Now().Add(sessionInterval) // e.g. no session yet
+		p.retry = time.Now().Add(redialInterval) // e.g. no session yet
 		return nil
 	}
 	p.c = c
 	return c
 }
 
-func (p *ctlPool) run(command string) (string, error) {
+// Run sends one tmux command over the connection and returns its output.
+func (p *Pool) Run(command string) (string, error) {
 	c := p.get()
 	if c == nil {
 		return "", errors.New("no tmux control connection")
@@ -215,26 +222,27 @@ func (p *ctlPool) run(command string) (string, error) {
 		p.mu.Lock()
 		if p.c == c {
 			p.c = nil
-			p.retry = time.Now().Add(sessionInterval)
+			p.retry = time.Now().Add(redialInterval)
 		}
 		p.mu.Unlock()
 	}
 	return out, err
 }
 
-// table looks the key table up over the control connection, and with
+// Table looks the key table up over the control connection, and with
 // fallback when there is none.
-func (p *ctlPool) table(fallback tableFunc) tableFunc {
+func (p *Pool) Table(fallback TableFunc) TableFunc {
 	return func(client string) (string, error) {
-		out, err := p.run(`list-clients -F "` + clientFormat + `"`)
+		out, err := p.Run(`list-clients -F "` + ClientFormat + `"`)
 		if err != nil {
 			return fallback(client)
 		}
-		return tableOf(out, client)
+		return TableOf(out, client)
 	}
 }
 
-func (p *ctlPool) close() {
+// Close ends the connection.
+func (p *Pool) Close() {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if p.c != nil {

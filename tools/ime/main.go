@@ -19,6 +19,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/imectl"
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/prefix"
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/tmuxctl"
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/watch"
 )
 
 func main() {
@@ -31,14 +36,14 @@ func main() {
 	switch cmd {
 	case "get":
 		var s string
-		if s, err = imeState(); err == nil {
+		if s, err = imectl.State(); err == nil {
 			fmt.Print(s)
 		}
 	case "set":
 		if len(args) != 1 || (args[0] != "en" && args[0] != "ja") {
 			err = fmt.Errorf("usage: ime set en|ja")
 		} else {
-			err = setIME(args[0] == "ja")
+			err = imectl.Set(args[0] == "ja")
 		}
 	case "prefix":
 		fs := flag.NewFlagSet("prefix", flag.ExitOnError)
@@ -49,8 +54,8 @@ func main() {
 		} else {
 			// A running watcher does the work if there is one; it keeps a
 			// single tmux connection instead of starting tmux per poll.
-			if !notifyDaemon(*socket, fs.Arg(0)) {
-				prefixSession(fs.Arg(0), spawnTable(tmuxClient{socket: *socket}))
+			if !prefix.Notify(*socket, fs.Arg(0)) {
+				prefix.Session(fs.Arg(0), tmuxctl.SpawnTable(tmuxctl.Client{Socket: *socket}))
 			}
 		}
 	case "watch":
@@ -58,7 +63,7 @@ func main() {
 		socket := fs.String("L", "", "tmux socket name (default socket if empty)")
 		serverPID := fs.Uint("server-pid", 0, "internal: psmux server to follow (set by watch when it detaches)")
 		fs.Parse(args)
-		err = watch(*socket, uint32(*serverPID))
+		err = watch.Run(*socket, uint32(*serverPID))
 	default:
 		err = fmt.Errorf("unknown command %q (get, set, prefix, watch)", cmd)
 	}

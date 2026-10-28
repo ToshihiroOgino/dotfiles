@@ -1,6 +1,6 @@
 //go:build windows
 
-package main
+package watch
 
 import (
 	"fmt"
@@ -11,6 +11,9 @@ import (
 	"syscall"
 	"time"
 	"unsafe"
+
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/imectl"
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/tmuxctl"
 )
 
 const (
@@ -21,7 +24,6 @@ const (
 	infinite       = 0xFFFFFFFF // INFINITE
 	waitObject0    = 0x00000000 // WAIT_OBJECT_0
 	waitAbandoned0 = 0x00000080 // WAIT_ABANDONED_0
-	createNoWindow = 0x08000000 // CREATE_NO_WINDOW
 	detached       = 0x00000008 // DETACHED_PROCESS
 	newProcGroup   = 0x00000200 // CREATE_NEW_PROCESS_GROUP
 )
@@ -35,7 +37,7 @@ var (
 // serverNames are the executables psmux runs its server as.
 var serverNames = map[string]bool{"tmux.exe": true, "psmux.exe": true, "pmux.exe": true}
 
-// watch runs one resident watcher per socket. Every psmux server starts one
+// Run runs one resident watcher per socket. Every psmux server starts one
 // (run-shell -b in tmux.conf); a named mutex lets exactly one of them work
 // while the others wait to take over. Each exits when its own server exits,
 // because psmux does not kill run-shell -b children on kill-server.
@@ -43,7 +45,7 @@ var serverNames = map[string]bool{"tmux.exe": true, "psmux.exe": true, "pmux.exe
 // psmux starts run-shell commands through `pwsh -Command`, and that pwsh
 // (~75 MB) would live as long as we do. So the first invocation locates its
 // server, re-launches itself detached with --server-pid, and exits at once.
-func watch(socket string, serverPID uint32) error {
+func Run(socket string, serverPID uint32) error {
 	if serverPID == 0 {
 		// Without a server to follow nothing would ever stop us, e.g. when a
 		// server dies while its config is still running. Refuse instead.
@@ -94,7 +96,7 @@ func watch(socket string, serverPID uint32) error {
 		return fmt.Errorf("WaitForMultipleObjects: %w", err)
 	}
 
-	tmux := tmuxClient{socket: socket}
+	tmux := tmuxctl.Client{Socket: socket}
 	var last string
 	known := map[string]bool{}
 	nextScan := time.Now().Add(sessionInterval)
@@ -102,16 +104,16 @@ func watch(socket string, serverPID uint32) error {
 		if ev, _ := syscall.WaitForSingleObject(server, 0); ev == waitObject0 {
 			return nil
 		}
-		state, _ := imeState()
+		state, _ := imectl.State()
 		now := time.Now()
 		if state != last {
 			// Notify tmux only when the mode changes.
 			last = state
-			known = tmux.push(state, known, true)
+			known = push(tmux, state, known, true)
 			nextScan = now.Add(sessionInterval)
 		} else if now.After(nextScan) {
 			// New sessions have no @ime yet; send the current mode to them only.
-			known = tmux.push(state, known, false)
+			known = push(tmux, state, known, false)
 			nextScan = now.Add(sessionInterval)
 		}
 		time.Sleep(pollInterval)
@@ -184,10 +186,4 @@ func serverProcess() (uint32, bool) {
 		pid = p.parent
 	}
 	return 0, false
-}
-
-// hideConsole keeps tmux invocations from flashing a console window when the
-// watcher itself runs without one.
-func hideConsole(cmd *exec.Cmd) {
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: createNoWindow}
 }

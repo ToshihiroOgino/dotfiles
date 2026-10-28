@@ -1,6 +1,6 @@
 //go:build linux
 
-package main
+package imectl
 
 import (
 	"context"
@@ -13,11 +13,11 @@ import (
 
 const queryTimeout = 500 * time.Millisecond
 
-// imeState maps the current fcitx5 input method name to a mode. Plain
+// State maps the current fcitx5 input method name to a mode. Plain
 // keyboard layouts are named keyboard-<layout> (keyboard-us, keyboard-jp,
 // keyboard-us-dvorak, ...) whatever the physical layout is, so those mean
 // alphanumeric input and any other name is an input method engine (mozc, ...).
-func imeState() (string, error) {
+func State() (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), queryTimeout)
 	defer cancel()
 	out, err := exec.CommandContext(ctx, "fcitx5-remote", "-n").Output()
@@ -27,11 +27,11 @@ func imeState() (string, error) {
 	if err != nil {
 		return "?", nil // fcitx5 not running
 	}
-	return modeOf(strings.TrimSpace(string(out))), nil
+	return ModeOf(strings.TrimSpace(string(out))), nil
 }
 
-// modeOf maps an input method name to "あ", "A" or "?".
-func modeOf(name string) string {
+// ModeOf maps an input method name to "あ", "A" or "?".
+func ModeOf(name string) string {
 	switch {
 	case name == "":
 		return "?"
@@ -42,9 +42,9 @@ func modeOf(name string) string {
 	}
 }
 
-// setIME deactivates fcitx5, which falls back to the group's first input
+// Set deactivates fcitx5, which falls back to the group's first input
 // method (the plain keyboard layout), or activates it again.
-func setIME(native bool) error {
+func Set(native bool) error {
 	flag := "-c"
 	if native {
 		flag = "-o"
@@ -57,8 +57,8 @@ func setIME(native bool) error {
 	return nil
 }
 
-// saveIME returns the current input method name.
-func saveIME() (string, error) {
+// Save returns the current input method name.
+func Save() (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), queryTimeout)
 	defer cancel()
 	out, err := exec.CommandContext(ctx, "fcitx5-remote", "-n").Output()
@@ -72,8 +72,8 @@ func saveIME() (string, error) {
 	return name, nil
 }
 
-// restoreIME switches back to the input method a saveIME token names.
-func restoreIME(token string) error {
+// Restore switches back to the input method a Save token names.
+func Restore(token string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), queryTimeout)
 	defer cancel()
 	if err := exec.CommandContext(ctx, "fcitx5-remote", "-s", token).Run(); err != nil {
