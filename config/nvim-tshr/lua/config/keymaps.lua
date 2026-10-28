@@ -6,3 +6,6 @@ vim.keymap.set("n", "<leader>fb", function() Snacks.picker.buffers() end, { desc
 vim.keymap.set("n", "<leader>fr", function() Snacks.picker.recent() end, { desc = "Recent files" })
 vim.keymap.set("n", "<leader>e", "<Cmd>Oil<CR>", { desc = "Open parent directory" })
 vim.keymap.set("n", "<leader>gg", function() Snacks.lazygit() end, { desc = "Lazygit" })
+vim.keymap.set({ "n", "x" }, "<leader>cf", function()
+  require("conform").format({ lsp_format = "fallback" })
+end, { desc = "Format" })
