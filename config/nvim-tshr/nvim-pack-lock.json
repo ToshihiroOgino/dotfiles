@@ -17,6 +17,10 @@
       "rev": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d",
       "src": "https://github.com/mason-org/mason.nvim"
     },
+    "mini.tabline": {
+      "rev": "3dd8686c15e3cfb1bfbc4abfecf699326f1de4c0",
+      "src": "https://github.com/echasnovski/mini.tabline"
+    },
     "nvim-lspconfig": {
       "rev": "4feaba4d3980032b3f62f3ba5df4de27fdf59cfd",
       "src": "https://github.com/neovim/nvim-lspconfig"

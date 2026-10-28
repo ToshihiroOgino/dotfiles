@@ -65,3 +65,8 @@ end, { desc = "Swap parameter with previous" })
 vim.keymap.set("n", "<leader>cx", function()
   require("treesitter-context").go_to_context(vim.v.count1)
 end, { desc = "Go to context" })
+
+-- buffers: close without breaking the window layout (snacks bufdelete)
+vim.keymap.set("n", "<leader>bd", function() Snacks.bufdelete() end, { desc = "Delete buffer" })
+vim.keymap.set("n", "<leader>bo", function() Snacks.bufdelete.other() end, { desc = "Delete other buffers" })
+vim.keymap.set("n", "<leader>ba", function() Snacks.bufdelete.all() end, { desc = "Delete all buffers" })
