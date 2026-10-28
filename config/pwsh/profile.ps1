@@ -1,13 +1,10 @@
-$theme = "wopian"
-oh-my-posh init pwsh --config $theme | Invoke-Expression
-
-# Strip the OS icon, and prefix a red [sudo] when running elevated.
+# Prefix a red [sudo] when running elevated.
 $isElevated = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-$global:__ompPrompt = ${function:prompt}
-function global:prompt {
-  $p = (& $global:__ompPrompt) -replace '[\ue62a\uf17a]((?:\e\[[0-9;]*m)*) ', '$1'
-  if ($isElevated) { $p = "`e[31m[sudo]`e[0m " + $p }
-  $p
+if ($isElevated -and "${function:prompt}" -notmatch '__basePrompt') {
+  $global:__basePrompt = ${function:prompt}
+  function global:prompt {
+    "`e[31m[sudo]`e[0m " + (& $global:__basePrompt)
+  }
 }
 
 # Shows pending package changes in the prompt. Needs `make pkgsync`.
