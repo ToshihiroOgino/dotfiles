@@ -5,20 +5,6 @@
 # Directory of this file, so the scripts are found from any working directory.
 SCRIPTS := $(dir $(lastword $(MAKEFILE_LIST)))
 
-ifeq ($(OS),Windows_NT)
-GIT_ROOT := $(abspath $(shell git --exec-path)/../../..)
-$(if $(wildcard $(GIT_ROOT)/usr/bin/sh.exe),,$(error Git for Windows not found: $(GIT_ROOT)/usr/bin/sh.exe))
-export PATH := $(GIT_ROOT)/usr/bin;$(PATH)
-SHELL := $(GIT_ROOT)/usr/bin/sh.exe
-# pwsh/cmd do not define HOME.
-HOME ?= $(subst \,/,$(USERPROFILE))
-export HOME
-endif
-
-PLATFORM := $(shell sh $(SCRIPTS)os.sh)
-$(if $(PLATFORM),,$(error cannot detect the platform: $(SCRIPTS)os.sh failed))
-FAMILY := $(if $(filter windows,$(PLATFORM)),windows,unix)
-
 LINK := sh $(SCRIPTS)link.sh
 # For machine-local files: created from templates/ when missing.
 LINK_LOCAL := $(LINK) --local

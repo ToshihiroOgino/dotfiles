@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := link
 
+include scripts/env.mk
 include scripts/link.mk
 
 all: tools link systemd-enable
