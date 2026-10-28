@@ -15,6 +15,8 @@ import (
 	"sync/atomic"
 	"syscall"
 	"time"
+
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/tmuxctl"
 )
 
 // watchName names the lock and the socket of the watcher for a tmux socket.
@@ -74,8 +76,8 @@ func servePrefix(socket string) (stop func()) {
 	if err != nil {
 		return func() {}
 	}
-	pool := &ctlPool{socket: socket}
-	lookup := pool.table(spawnTable(tmuxClient{socket: socket}))
+	pool := &tmuxctl.Pool{Socket: socket}
+	lookup := pool.Table(tmuxctl.SpawnTable(tmuxctl.Client{Socket: socket}))
 	var closing atomic.Bool
 	table := func(client string) (string, error) {
 		if closing.Load() {
@@ -112,7 +114,7 @@ func servePrefix(socket string) (stop func()) {
 		case <-done:
 		case <-time.After(2 * time.Second):
 		}
-		pool.close()
+		pool.Close()
 	}
 }
 

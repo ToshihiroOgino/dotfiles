@@ -1,4 +1,4 @@
-package main
+package tmuxctl
 
 import "testing"
 
@@ -14,9 +14,9 @@ func TestClientTable(t *testing.T) {
 		{"/dev/ttys009", "", false},
 	}
 	for _, c := range cases {
-		table, ok := clientTable(out, c.client)
+		table, ok := ClientTable(out, c.client)
 		if table != c.table || ok != c.ok {
-			t.Errorf("clientTable(%q) = %q, %v; want %q, %v", c.client, table, ok, c.table, c.ok)
+			t.Errorf("ClientTable(%q) = %q, %v; want %q, %v", c.client, table, ok, c.table, c.ok)
 		}
 	}
 }

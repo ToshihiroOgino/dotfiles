@@ -5,10 +5,12 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"syscall"
 	"time"
+
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/imectl"
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/tmuxctl"
 )
 
 const (
@@ -20,7 +22,7 @@ const (
 // pollWait is the polling state source: it reads the IME state, then sleeps
 // at most pollInterval.
 func pollWait(d time.Duration) string {
-	state, _ := imeState()
+	state, _ := imectl.State()
 	time.Sleep(min(d, pollInterval))
 	return state
 }
@@ -45,7 +47,7 @@ func runWatch(socket string, newWait func() func(d time.Duration) string) error 
 
 	defer servePrefix(socket)()
 	wait := newWait()
-	tmux := tmuxClient{socket: socket}
+	tmux := tmuxctl.Client{Socket: socket}
 	var last string
 	known := map[string]bool{}
 	failures := 0
@@ -57,17 +59,17 @@ func runWatch(socket string, newWait func() func(d time.Duration) string) error 
 		if state != last {
 			// Notify tmux only when the mode changes.
 			last = state
-			known = tmux.push(state, known, true)
+			known = push(tmux, state, known, true)
 			nextScan = now.Add(sessionInterval)
 		} else if now.After(nextScan) {
 			// New sessions have no @ime yet; send the current mode to them only.
-			known = tmux.push(state, known, false)
+			known = push(tmux, state, known, false)
 			nextScan = now.Add(sessionInterval)
 		}
 		if now.After(nextAlive) {
 			// Stop once the server has stopped answering.
 			nextAlive = now.Add(sessionInterval)
-			if _, err := tmux.sessions(); err == nil {
+			if _, err := tmux.Sessions(); err == nil {
 				failures = 0
 			} else if failures++; failures >= maxFailures {
 				return nil
@@ -75,5 +77,3 @@ func runWatch(socket string, newWait func() func(d time.Duration) string) error 
 		}
 	}
 }
-
-func hideConsole(*exec.Cmd) {}

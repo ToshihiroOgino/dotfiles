@@ -11,6 +11,8 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/imectl"
 )
 
 // watch follows fcitx5's CurrentIM signal through a resident dbus-monitor, so
@@ -45,7 +47,7 @@ func newSignalSource() *signalSource {
 
 // resync reads the state with fcitx5-remote.
 func (s *signalSource) resync() {
-	state, err := imeState()
+	state, err := imectl.State()
 	if err != nil {
 		state = "?"
 	}
@@ -117,7 +119,7 @@ func (s *signalSource) monitor() {
 		case strs >= 0:
 			if m := stringLine.FindStringSubmatch(line); m != nil {
 				if strs++; strs == 2 {
-					s.set(modeOf(m[1]))
+					s.set(imectl.ModeOf(m[1]))
 					strs = -1
 				}
 			}

@@ -1,6 +1,6 @@
 //go:build windows
 
-package main
+package imectl
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ var (
 	imeWnd  = imm32.NewProc("ImmGetDefaultIMEWnd")
 )
 
-func imeState() (string, error) {
+func State() (string, error) {
 	ime := foregroundIME()
 	if ime == 0 {
 		return "?", nil
@@ -46,9 +46,9 @@ func imeState() (string, error) {
 	return "A", nil
 }
 
-// setIME closes the IME for alphanumeric input, or opens it in hiragana
+// Set closes the IME for alphanumeric input, or opens it in hiragana
 // (native + full-width) mode.
-func setIME(native bool) error {
+func Set(native bool) error {
 	ime := foregroundIME()
 	if ime == 0 {
 		return fmt.Errorf("no IME window")
@@ -85,8 +85,8 @@ func foregroundIME() uintptr {
 	return ime
 }
 
-// saveIME returns the open status and conversion mode as "open:mode".
-func saveIME() (string, error) {
+// Save returns the open status and conversion mode as "open:mode".
+func Save() (string, error) {
 	ime := foregroundIME()
 	if ime == 0 {
 		return "", fmt.Errorf("no IME window")
@@ -99,8 +99,8 @@ func saveIME() (string, error) {
 	return fmt.Sprintf("%d:%d", open, mode), nil
 }
 
-// restoreIME puts back the open status and conversion mode of a saveIME token.
-func restoreIME(token string) error {
+// Restore puts back the open status and conversion mode of a Save token.
+func Restore(token string) error {
 	var open, mode uintptr
 	if _, err := fmt.Sscanf(token, "%d:%d", &open, &mode); err != nil {
 		return fmt.Errorf("bad token %q", token)

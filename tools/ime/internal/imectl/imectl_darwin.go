@@ -1,6 +1,6 @@
 //go:build darwin
 
-package main
+package imectl
 
 /*
 #cgo LDFLAGS: -framework Carbon -framework CoreFoundation
@@ -128,7 +128,7 @@ func init() {
 	runtime.LockOSThread()
 }
 
-func imeState() (string, error) {
+func State() (string, error) {
 	switch C.imeMode() {
 	case 1:
 		return "あ", nil
@@ -138,7 +138,7 @@ func imeState() (string, error) {
 	return "?", nil
 }
 
-func setIME(native bool) error {
+func Set(native bool) error {
 	ja := C.int(0)
 	if native {
 		ja = 1
@@ -149,8 +149,8 @@ func setIME(native bool) error {
 	return nil
 }
 
-// saveIME returns an opaque token for the current input source.
-func saveIME() (string, error) {
+// Save returns an opaque token for the current input source.
+func Save() (string, error) {
 	var buf [256]C.char
 	if C.imeToken(&buf[0], C.size_t(len(buf))) != 0 {
 		return "", fmt.Errorf("failed to read input source")
@@ -158,8 +158,8 @@ func saveIME() (string, error) {
 	return C.GoString(&buf[0]), nil
 }
 
-// restoreIME switches back to the input source a saveIME token names.
-func restoreIME(token string) error {
+// Restore switches back to the input source a Save token names.
+func Restore(token string) error {
 	cs := C.CString(token)
 	defer C.free(unsafe.Pointer(cs))
 	if C.imeRestore(cs) != 0 {

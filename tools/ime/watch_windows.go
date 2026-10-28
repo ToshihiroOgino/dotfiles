@@ -11,6 +11,9 @@ import (
 	"syscall"
 	"time"
 	"unsafe"
+
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/imectl"
+	"github.com/ToshihiroOgino/dotfiles/tools/ime/internal/tmuxctl"
 )
 
 const (
@@ -94,7 +97,7 @@ func watch(socket string, serverPID uint32) error {
 		return fmt.Errorf("WaitForMultipleObjects: %w", err)
 	}
 
-	tmux := tmuxClient{socket: socket}
+	tmux := tmuxctl.Client{Socket: socket}
 	var last string
 	known := map[string]bool{}
 	nextScan := time.Now().Add(sessionInterval)
@@ -102,16 +105,16 @@ func watch(socket string, serverPID uint32) error {
 		if ev, _ := syscall.WaitForSingleObject(server, 0); ev == waitObject0 {
 			return nil
 		}
-		state, _ := imeState()
+		state, _ := imectl.State()
 		now := time.Now()
 		if state != last {
 			// Notify tmux only when the mode changes.
 			last = state
-			known = tmux.push(state, known, true)
+			known = push(tmux, state, known, true)
 			nextScan = now.Add(sessionInterval)
 		} else if now.After(nextScan) {
 			// New sessions have no @ime yet; send the current mode to them only.
-			known = tmux.push(state, known, false)
+			known = push(tmux, state, known, false)
 			nextScan = now.Add(sessionInterval)
 		}
 		time.Sleep(pollInterval)
@@ -184,10 +187,4 @@ func serverProcess() (uint32, bool) {
 		pid = p.parent
 	}
 	return 0, false
-}
-
-// hideConsole keeps tmux invocations from flashing a console window when the
-// watcher itself runs without one.
-func hideConsole(cmd *exec.Cmd) {
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: createNoWindow}
 }

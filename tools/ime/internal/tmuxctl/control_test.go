@@ -1,6 +1,4 @@
-//go:build darwin || linux
-
-package main
+package tmuxctl
 
 import (
 	"bufio"
@@ -52,16 +50,16 @@ func TestCtlPoolWithRealTmux(t *testing.T) {
 	}
 	t.Setenv("TMUX", "")
 	const sock = "ime-go-test"
-	tmux := tmuxClient{socket: sock}
-	if _, err := tmux.run("-f", "/dev/null", "new-session", "-d", "-s", "t"); err != nil {
+	tmux := Client{Socket: sock}
+	if _, err := tmux.Run("-f", "/dev/null", "new-session", "-d", "-s", "t"); err != nil {
 		t.Skipf("cannot start tmux: %v", err)
 	}
-	t.Cleanup(func() { tmux.run("kill-server") })
+	t.Cleanup(func() { tmux.Run("kill-server") })
 
-	pool := &ctlPool{socket: sock}
-	defer pool.close()
-	table := pool.table(func(string) (string, error) { return "", fmt.Errorf("fallback used") })
-	out, err := pool.run(`list-clients -F "` + clientFormat + `"`)
+	pool := &Pool{Socket: sock}
+	defer pool.Close()
+	table := pool.Table(func(string) (string, error) { return "", fmt.Errorf("fallback used") })
+	out, err := pool.Run(`list-clients -F "` + ClientFormat + `"`)
 	if err != nil || !strings.Contains(out, "\troot") {
 		t.Fatalf("list-clients = %q, %v", out, err)
 	}
@@ -70,7 +68,7 @@ func TestCtlPoolWithRealTmux(t *testing.T) {
 		t.Errorf("table(%q) = %q, %v", name, got, err)
 	}
 	// After the server is gone the lookup falls back instead of hanging.
-	tmux.run("kill-server")
+	tmux.Run("kill-server")
 	if _, err := table(name); err == nil || !strings.Contains(err.Error(), "fallback") {
 		t.Errorf("after kill-server: err = %v, want the fallback", err)
 	}
@@ -82,12 +80,12 @@ func TestCtlPoolWithTMUXSet(t *testing.T) {
 	}
 	t.Setenv("TMUX", "")
 	const sock = "ime-go-test2"
-	tmux := tmuxClient{socket: sock}
-	if _, err := tmux.run("-f", "/dev/null", "new-session", "-d", "-s", "t"); err != nil {
+	tmux := Client{Socket: sock}
+	if _, err := tmux.Run("-f", "/dev/null", "new-session", "-d", "-s", "t"); err != nil {
 		t.Skipf("cannot start tmux: %v", err)
 	}
-	t.Cleanup(func() { tmux.run("kill-server") })
-	info, err := tmux.run("display-message", "-p", "#{socket_path},#{pid},0")
+	t.Cleanup(func() { tmux.Run("kill-server") })
+	info, err := tmux.Run("display-message", "-p", "#{socket_path},#{pid},0")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,9 +93,9 @@ func TestCtlPoolWithTMUXSet(t *testing.T) {
 	// The watcher is started by run-shell, so $TMUX names the server and
 	// there is no -L.
 	t.Setenv("TMUX", strings.TrimSpace(info))
-	pool := &ctlPool{}
-	defer pool.close()
-	out, err := pool.run(`list-clients -F "` + clientFormat + `"`)
+	pool := &Pool{}
+	defer pool.Close()
+	out, err := pool.Run(`list-clients -F "` + ClientFormat + `"`)
 	if err != nil || !strings.Contains(out, "\troot") {
 		t.Fatalf("list-clients = %q, %v", out, err)
 	}
@@ -108,7 +106,7 @@ func TestCtlPoolBacksOffAfterFailedDial(t *testing.T) {
 		t.Skip("tmux not installed")
 	}
 	t.Setenv("TMUX", "")
-	pool := &ctlPool{socket: "ime-go-test-none"} // no server there
+	pool := &Pool{Socket: "ime-go-test-none"} // no server there
 	if c := pool.get(); c != nil {
 		t.Fatal("connected to a server that does not exist")
 	}

@@ -1,24 +1,24 @@
 //go:build !windows && !darwin && !linux
 
-package main
+package imectl
 
 import (
 	"fmt"
 	"runtime"
 )
 
-func imeState() (string, error) {
+func State() (string, error) {
 	return "", fmt.Errorf("not supported on %s", runtime.GOOS)
 }
 
-func setIME(bool) error {
+func Set(bool) error {
 	return fmt.Errorf("not supported on %s", runtime.GOOS)
 }
 
-func saveIME() (string, error) {
+func Save() (string, error) {
 	return "", fmt.Errorf("not supported on %s", runtime.GOOS)
 }
 
-func restoreIME(string) error {
+func Restore(string) error {
 	return fmt.Errorf("not supported on %s", runtime.GOOS)
 }

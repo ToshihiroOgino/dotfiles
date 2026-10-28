@@ -22,6 +22,12 @@ make build
 
 On Linux and macOS, `ime prefix` hands the work to the running `ime watch` over a Unix socket (`$XDG_RUNTIME_DIR/ime-watch[-socket].sock`, or a private `ime-<uid>` directory under the temporary directory). The watcher keeps one `tmux -C` connection and asks it for the client's key table while the prefix is active, so no tmux process starts per poll. Without a watcher or a control connection (and on Windows), `ime prefix` polls `tmux list-clients` itself.
 
+## Layout
+
+- `internal/imectl`: reads and switches the IME mode, one file per platform.
+- `internal/tmuxctl`: runs tmux commands, per call (`Client`) or over one control-mode connection (`Pool`), and parses `list-clients`.
+- the main package: the command line, `watch` and `prefix`, which use the two above.
+
 ## Platforms
 
 - Windows
