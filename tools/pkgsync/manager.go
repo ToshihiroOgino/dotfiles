@@ -9,11 +9,12 @@ import (
 
 // Snapshot is what a package manager reports for this machine.
 type Snapshot struct {
-	Packages []string
-	Buckets  []string // only for managers with HasBuckets
-	External []string // installed from outside the repositories; not tracked
-	Initial  []string // installed by the OS installer; not tracked, but present
-	Warnings []string // things to look at; only scoop reports any (Info)
+	Packages  []string
+	Buckets   []string // only for managers with HasBuckets
+	External  []string // installed from outside the repositories; not tracked
+	Initial   []string // installed by the OS installer; not tracked, but present
+	Installed []string // every installed package, auto-installed ones included; only for presence
+	Warnings  []string // things to look at; only scoop reports any (Info)
 }
 
 type Manager interface {

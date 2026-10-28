@@ -119,6 +119,8 @@ func compare(m Manager, t Tracked, s Snapshot) (Diff, error) {
 	// Likewise for packages the OS installer put there.
 	present := append(append([]string{}, cur...), keep(s.External)...)
 	present = append(present, keep(s.Initial)...)
+	// Auto-installed packages are not reported as manual, but are present.
+	present = append(present, keep(s.Installed)...)
 	d.AddPkgs, d.DelPkgs = minus(cur, tr), minus(tr, present)
 	if m.HasBuckets() {
 		tb := keep(t.bucketList())
@@ -135,19 +137,12 @@ func (t Tracked) bucketList() []string {
 	return *t.Buckets
 }
 
-// apply folds d into t. Removals are applied only when prune is set.
-func apply(t *Tracked, d Diff, prune bool) {
-	pkgs, buckets := d.AddPkgs, d.AddBuckets
-	t.Packages = merge(t.Packages, pkgs)
-	if t.Buckets != nil || len(buckets) > 0 {
-		b := merge(t.bucketList(), buckets)
-		if prune {
-			b = minus(b, d.DelBuckets)
-		}
+// apply folds d into t: additions and removals.
+func apply(t *Tracked, d Diff) {
+	t.Packages = minus(merge(t.Packages, d.AddPkgs), d.DelPkgs)
+	if t.Buckets != nil || len(d.AddBuckets) > 0 {
+		b := minus(merge(t.bucketList(), d.AddBuckets), d.DelBuckets)
 		t.Buckets = &b
-	}
-	if prune {
-		t.Packages = minus(t.Packages, d.DelPkgs)
 	}
 }
 

@@ -1,4 +1,4 @@
-# Source from zshrc: runs `pkgsync check` in the background and shows
+# Source from zshrc: runs `pkgsync diff --throttle` in the background and shows
 # packages/pending/summary in the prompt. Does nothing until `make pkgsync`.
 
 _pkgsync_root=${PKGSYNC_ROOT:-$HOME/dotfiles}
@@ -8,7 +8,7 @@ _pkgsync_bin=$_pkgsync_root/tools/pkgsync/pkgsync
 alias pkgsync=$_pkgsync_bin
 
 # The subshell keeps zsh from printing a job number.
-( "$_pkgsync_bin" check >/dev/null 2>&1 & )
+( "$_pkgsync_bin" diff --throttle >/dev/null 2>&1 & )
 
 # PROMPT is edited here so that a theme loaded later cannot overwrite it.
 _pkgsync_precmd() {

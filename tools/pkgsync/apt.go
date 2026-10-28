@@ -77,22 +77,28 @@ func (apt) Snapshot() (Snapshot, error) {
 	// repository provides (.deb installs). apt-mark prints foreign
 	// architectures as "name:arch", so both spellings are registered.
 	local := map[string]bool{}
+	var all []string
 	for _, l := range lines(installed) {
-		if !strings.Contains(l, ",local]") {
-			continue
-		}
 		name, rest, ok := strings.Cut(l, "/")
 		if !ok {
 			continue
 		}
+		all = append(all, name)
+		f := strings.Fields(rest)
+		if len(f) >= 3 {
+			all = append(all, name+":"+f[2])
+		}
+		if !strings.Contains(l, ",local]") {
+			continue
+		}
 		local[name] = true
-		if f := strings.Fields(rest); len(f) >= 3 {
+		if len(f) >= 3 {
 			local[name+":"+f[2]] = true
 		}
 	}
 
 	initial := initialPackages()
-	var s Snapshot
+	s := Snapshot{Installed: all}
 	for _, name := range lines(manual) {
 		if initial[name] {
 			s.Initial = append(s.Initial, name)

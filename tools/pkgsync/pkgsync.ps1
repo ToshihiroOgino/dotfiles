@@ -1,5 +1,5 @@
 # Dot-source from the pwsh profile, after the prompt is set up: runs
-# `pkgsync check` in the background and shows packages/pending/summary in
+# `pkgsync diff --throttle` in the background and shows packages/pending/summary in
 # the prompt. Does nothing until `make pkgsync`.
 
 $root = if ($env:PKGSYNC_ROOT) { $env:PKGSYNC_ROOT } else { Join-Path $HOME 'dotfiles' }
@@ -8,7 +8,7 @@ if (-not (Test-Path -LiteralPath $exe)) { return }
 
 $env:PKGSYNC_ROOT = $root
 Set-Alias -Name pkgsync -Value $exe -Scope Global
-Start-Process -WindowStyle Hidden -FilePath $exe -ArgumentList 'check'
+Start-Process -WindowStyle Hidden -FilePath $exe -ArgumentList 'diff','--throttle'
 
 # Wrap the current prompt once, so that reloading the profile cannot nest it.
 if ("${function:prompt}" -notmatch '__pkgsyncPrompt') {
