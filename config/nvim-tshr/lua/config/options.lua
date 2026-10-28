@@ -7,3 +7,8 @@ if vim.fn.filereadable(vimrc) == 1 then
 end
 
 vim.o.fileformat = "unix"
+
+vim.o.autocomplete = true
+vim.o.autocompletedelay = 5
+vim.o.complete = "o,.,w,b"
+vim.o.completeopt = "menu,menuone,popup,fuzzy,noselect"
