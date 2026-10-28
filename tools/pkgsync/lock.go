@@ -8,17 +8,17 @@ import (
 
 var errLocked = errors.New("another pkgsync is running")
 
-// acquire takes an exclusive OS lock on <root>/.local/pkgsync.lock. It never
+// acquire takes an exclusive OS lock on <root>/packages/pending/.lock. It never
 // waits: of several simultaneous callers exactly one succeeds and the rest
 // get errLocked at once. The OS drops the lock when the holder exits, even
 // if it crashes, so there is no stale lock to clean up. The file itself is
 // left in place on purpose; removing it would reopen a race.
 func acquire(root string) (release func(), err error) {
-	dir := filepath.Join(root, ".local")
+	dir := filepath.Join(root, "packages", "pending")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err
 	}
-	f, err := os.OpenFile(filepath.Join(dir, "pkgsync.lock"), os.O_CREATE|os.O_RDWR, 0o644)
+	f, err := os.OpenFile(filepath.Join(dir, ".lock"), os.O_CREATE|os.O_RDWR, 0o644)
 	if err != nil {
 		return nil, err
 	}

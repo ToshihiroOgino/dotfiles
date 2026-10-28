@@ -2,9 +2,11 @@
 
 include scripts/link.mk
 
-all: link imestat pkgsync systemd-enable
+all: tools link systemd-enable
 
 .PHONY: all imestat pkgsync systemd-enable
+
+tools: imestat pkgsync
 
 imestat:
 	"$(MAKE)" -C tools/imestat build

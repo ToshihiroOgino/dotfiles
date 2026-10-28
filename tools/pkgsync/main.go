@@ -2,11 +2,9 @@
 // with the tracked lists in packages/<mgr>.json.
 //
 //	pkgsync init     create an empty packages/<mgr>.json for every supported manager that has none
-//	pkgsync [diff]   print the difference; nothing is written
-//	pkgsync add      add new packages to packages/<mgr>.json
-//	pkgsync sync     add new and drop removed packages
-//	pkgsync check    for shell startup: at most once per 5 minutes, refresh
-//	                 packages/pending/<mgr>.diff (-f ignores the interval)
+//	pkgsync [diff]   print the difference and refresh packages/pending/
+//	                 (--throttle: skip if the last successful run is under 5 minutes old)
+//	pkgsync apply    add new and drop removed packages in packages/<mgr>.json
 //	pkgsync help     show the usage
 //
 // Package managers are detected from PATH. pkgsync never touches git and
@@ -26,12 +24,14 @@ usage: pkgsync [command]
 
 commands:
   init   create an empty packages/<mgr>.json for every supported manager that has none
-  diff   show the difference, and install commands for what is missing here (default)
-  add    add new packages to the list
-  sync   add new packages and drop removed ones
-  check  for shell startup: refresh packages/pending/ (once per 5 minutes, silent)
-         check -f refreshes now, ignoring the interval
+  diff   show the difference, and install commands for what is missing here (default);
+         also refreshes packages/pending/
+         diff --throttle does nothing if the last successful run is under 5 minutes old
+         (for shell startup; redirect the output yourself)
+  apply  add new packages to the list
   help   show this help
+
+Failures are logged to log/pkgsync/<UTC time>.log.
 
 The dotfiles root is $PKGSYNC_ROOT, or ~/dotfiles if unset.
 
@@ -46,13 +46,15 @@ func main() {
 	if flag.NArg() > 0 {
 		cmd = flag.Arg(0)
 	}
-	force := false
 	rest := flag.Args()
 	if len(rest) > 0 {
 		rest = rest[1:]
 	}
-	if cmd == "check" && len(rest) == 1 && rest[0] == "-f" {
-		force, rest = true, nil
+	// The only option each command takes, if any.
+	opt := map[string]string{"diff": "--throttle"}[cmd]
+	var optOn bool
+	if opt != "" && len(rest) == 1 && rest[0] == opt {
+		optOn, rest = true, nil
 	}
 	if len(rest) > 0 {
 		fmt.Fprintf(os.Stderr, "pkgsync: unexpected arguments %q\n", rest)
@@ -70,13 +72,9 @@ func main() {
 		case "init":
 			err = cmdInit(root)
 		case "diff":
-			err = cmdDiff(root)
-		case "add":
-			err = cmdApply(root, false)
-		case "sync":
-			err = cmdApply(root, true)
-		case "check":
-			err = cmdCheck(root, force)
+			err = cmdDiff(root, optOn)
+		case "apply":
+			err = cmdApply(root)
 		default:
 			fmt.Fprintf(os.Stderr, "pkgsync: unknown command %q\n", cmd)
 			flag.Usage()
@@ -90,7 +88,7 @@ func main() {
 }
 
 // resolveRoot returns the dotfiles root, which must exist: a typo in
-// PKGSYNC_ROOT must not make init or add create directories elsewhere.
+// PKGSYNC_ROOT must not make init or apply create directories elsewhere.
 func resolveRoot() (string, error) {
 	root := os.Getenv("PKGSYNC_ROOT")
 	if root == "" {
