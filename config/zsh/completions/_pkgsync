@@ -1,0 +1,24 @@
+#compdef pkgsync
+
+local state
+local -a commands=(
+  'init:create an empty packages/<mgr>.json for every supported manager'
+  'diff:show the difference with the tracked lists (default)'
+  'apply:add new packages to the list'
+  'help:show the usage'
+)
+
+_arguments -C \
+  '1: :->command' \
+  '*:: :->args' && return
+
+case $state in
+command)
+  _describe -t commands command commands
+  ;;
+args)
+  case $words[1] in
+  diff) _arguments '--throttle[skip if the last successful run is recent]' ;;
+  esac
+  ;;
+esac
