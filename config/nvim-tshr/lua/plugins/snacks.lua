@@ -19,7 +19,15 @@ end
 vim.fn.mkdir(vim.fn.stdpath("cache"), "p")
 
 require("snacks").setup({
-	image = { enabled = true },
+	image = {
+		enabled = true,
+		convert = {
+			magick = {
+				-- Default has "-trim", which crops PDF pages down to the text area.
+				pdf = { "-density", 192, "{src}[{page}]", "-background", "white", "-alpha", "remove" },
+			},
+		},
+	},
 	picker = {
 		sources = {
 			explorer = source(),
