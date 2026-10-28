@@ -9,3 +9,10 @@ vim.keymap.set("n", "<leader>gg", function() Snacks.lazygit() end, { desc = "Laz
 vim.keymap.set({ "n", "x" }, "<leader>cf", function()
   require("conform").format({ lsp_format = "fallback" })
 end, { desc = "Format" })
+
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("lsp_keymaps", { clear = true }),
+  callback = function(args)
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = args.buf, desc = "Definition" })
+  end,
+})
