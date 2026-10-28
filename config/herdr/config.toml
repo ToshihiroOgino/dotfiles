@@ -11,7 +11,7 @@ status_indicators = "symbols"
 redraw_on_focus_gained = true
 mouse_capture = true
 tab_bar_right = [
-  { type = "command", command = "$HOME/dotfiles/tools/ime/ime", interval_seconds = 1, timeout_seconds = 1 },
+  { type = "command", command = "$HOME/dotfiles/tools/ime/ime get -s", interval_seconds = 1, timeout_seconds = 1 },
   { type = "datetime", format = "%m/%d %H:%M" },
 ]
 tab_bar_right_separator = " "

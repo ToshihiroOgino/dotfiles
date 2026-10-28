@@ -1,7 +1,8 @@
 // Command ime reads and switches the IME input mode of the foreground
 // window.
 //
-//	ime [get]                print the mode once: "あ", "A", or "?"
+//	ime [get] [-s]           print the mode once: "ja", "en", or "?"
+//	                            (-s: the status bar symbols "あ", "A", or "?")
 //	ime set en|ja            switch to alphanumeric / native (Japanese) input
 //	ime prefix [-L s] CLIENT switch to alphanumeric input until the tmux client
 //	                            leaves the prefix key table, then restore the mode
@@ -35,8 +36,19 @@ func main() {
 	var err error
 	switch cmd {
 	case "get":
+		fs := flag.NewFlagSet("get", flag.ExitOnError)
+		symbol := fs.Bool("s", false, `print "あ"/"A" instead of "ja"/"en"`)
+		fs.Parse(args)
 		var s string
 		if s, err = imectl.State(); err == nil {
+			if !*symbol {
+				switch s {
+				case "あ":
+					s = "ja"
+				case "A":
+					s = "en"
+				}
+			}
 			fmt.Print(s)
 		}
 	case "set":

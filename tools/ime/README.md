@@ -13,7 +13,7 @@ make build
 ## Run
 
 ```sh
-./ime            # print the mode once (same as `get`)
+./ime            # print the mode once: ja, en or ? (same as `get`; `get -s` prints あ, A or ?)
 ./ime set en     # alphanumeric input
 ./ime set ja     # native (Japanese) input
 ./ime prefix CLIENT  # alphanumeric until the tmux client leaves the prefix table, then restore (tmux.conf runs this)
