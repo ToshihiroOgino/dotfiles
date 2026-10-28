@@ -12,12 +12,12 @@
 ```sh
 make all             # everything below
 make link            # link all configs for this OS
-make imestat         # build imestat
+make ime        # build ime
 make pkgsync         # build pkgsync
 make systemd-enable  # WSL only: enable systemd units
 ```
 
 ## Tools
 
-- [imestat](tools/imestat/README.md): shows the IME mode in the tmux status bar.
+- [ime](tools/ime/README.md): reads and switches the IME mode (tmux status bar, IME off during prefix).
 - [pkgsync](tools/pkgsync/README.md): compares installed packages with packages/<manager>.json.
