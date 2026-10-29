@@ -16,7 +16,7 @@ Neovim config written from scratch, run with `NVIM_APPNAME=nvim-tshr`. Plugins a
 
 ```sh
 make link-nvim-tshr   # link this directory to ~/.config/nvim-tshr
-v                     # alias for NVIM_APPNAME=nvim-tshr nvim (config/zsh/zshrc)
+nvim                  # alias for NVIM_APPNAME=nvim-tshr nvim (config/zsh/zshrc); lvim launches the LazyVim config (~/.config/nvim)
 ```
 
 Language servers and tools listed in `lua/plugins/mason.lua` are installed in the background on startup.

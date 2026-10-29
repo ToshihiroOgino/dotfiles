@@ -24,7 +24,8 @@ export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 
 alias bat=batcat
 alias rm=trash
-alias v='NVIM_APPNAME=nvim-tshr nvim'
+alias nvim='NVIM_APPNAME=nvim-tshr nvim'
+alias lvim='NVIM_APPNAME=nvim command nvim'
 
 export CMAKE_GENERATOR=Ninja
 export BAT_PAGER="less -RF --mouse"
