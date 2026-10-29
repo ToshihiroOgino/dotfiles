@@ -1,0 +1,37 @@
+#!/bin/sh
+# Record Claude Code's state on the tmux pane so the window list can show it.
+# usage: claude-tmux-state working|waiting|done|seen|clear [pane_id]
+# States: working ◐ / waiting ○ / done ✓ (unchecked) / seen ● (checked)
+state=$1
+pane=${2:-$TMUX_PANE}
+[ -n "$pane" ] || exit 0
+command -v tmux >/dev/null 2>&1 || exit 0
+
+cur=$(tmux show -pqv -t "$pane" @claude 2>/dev/null)
+
+case $state in
+working) ;;
+# idle notifications arrive after Stop; only a running turn can be blocked
+waiting) [ "$cur" = working ] || exit 0 ;;
+# already looking at the pane: nothing left to check
+done)
+	[ "$(tmux display -p -t "$pane" '#{&&:#{&&:#{pane_active},#{window_active}},#{session_attached}}')" = 1 ] && state=seen
+	;;
+seen) [ "$cur" = done ] || exit 0 ;;
+clear)
+	tmux set -pu -t "$pane" @claude
+	tmux set -pu -t "$pane" @claude_icon
+	exit 0
+	;;
+*) exit 1 ;;
+esac
+
+case $state in
+working) icon='#[fg=colour220]◐#[fg=default]' ;;
+waiting) icon='#[fg=colour209]○#[fg=default]' ;;
+done) icon='#[fg=colour78]✓#[fg=default]' ;;
+seen) icon='#[fg=colour244]●#[fg=default]' ;;
+esac
+
+tmux set -p -t "$pane" @claude "$state"
+tmux set -p -t "$pane" @claude_icon "$icon"
