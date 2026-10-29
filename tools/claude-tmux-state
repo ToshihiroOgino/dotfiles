@@ -29,8 +29,8 @@ esac
 case $state in
 working) icon='#[fg=colour220]◐#[fg=default]' ;;
 waiting) icon='#[fg=colour209]○#[fg=default]' ;;
-done) icon='#[fg=colour78]✓#[fg=default]' ;;
-seen) icon='#[fg=colour244]●#[fg=default]' ;;
+done) icon='#[fg=colour71]✓#[fg=default]' ;;
+seen) icon='#[fg=colour71]●#[fg=default]' ;;
 esac
 
 tmux set -p -t "$pane" @claude "$state"
