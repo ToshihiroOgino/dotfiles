@@ -16,6 +16,10 @@ if [[ -e "$HOME/.oh-my-zsh" ]]; then
   source $ZSH/oh-my-zsh.sh
 fi
 
+# Put the input line below the info line.
+PROMPT='$(git_custom_status)%{$fg[cyan]%}[%~% ]%{$reset_color%}
+%B$%b '
+
 export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 
 alias bat=batcat
