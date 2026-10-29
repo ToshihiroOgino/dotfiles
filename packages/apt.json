@@ -21,6 +21,8 @@
     "mesa-utils",
     "ninja-build",
     "npm",
+    "python3-pip",
+    "python3-venv",
     "ripgrep",
     "texlive-latex-base",
     "tmux",
