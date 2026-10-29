@@ -10,5 +10,7 @@ app-notifications = no-clipboard-copy
 
 mouse-scroll-multiplier = 1
 
+gtk-single-instance = false
+
 # Machine-local overrides (missing file is ignored).
 config-file = ?config.local
