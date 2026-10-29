@@ -1,10 +1,9 @@
 #!/bin/sh
-# Launch ghostty from wslg.exe (no shell, so ~/.zshenv is not read)
-# On a cold WSL start, a window created before the WSLg RDP client connects never shows,
-# and the single-instance ghostty then serves every later launch with that dead window.
-# Wait for the handshake (give up after 15s).
+# Shortcut command:
+#   "C:\Program Files\WSL\wslg.exe" -d Ubuntu-26.04 --cd "~" -- /home/tshr/dotfiles/scripts/ghostty-wslg.sh
 i=0
-until grep -q "Client HandShake" /mnt/wslg/weston.log 2>/dev/null || [ "$i" -ge 150 ]; do
+until { grep -q "Client HandShake" /mnt/wslg/weston.log 2>/dev/null \
+	&& systemctl --user is-active --quiet fcitx5.service 2>/dev/null; } || [ "$i" -ge 150 ]; do
         sleep 0.1
         i=$((i + 1))
 done
