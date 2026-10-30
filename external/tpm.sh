@@ -30,4 +30,6 @@ if ! tmux has-session 2>/dev/null; then
 fi
 trap '[ -z "$started" ] || tmux kill-server' EXIT
 
+tmux set-environment -g TMUX_PLUGIN_MANAGER_PATH "$PLUGINS/"
+
 "$DEST/bin/install_plugins"

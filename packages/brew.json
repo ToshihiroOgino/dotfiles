@@ -1,5 +1,5 @@
 {
-  "buckets": [],
+  "buckets": null,
   "packages": [
     "bat",
     "cask:ghostty",
@@ -11,7 +11,6 @@
     "kotlin",
     "lazygit",
     "lua",
-    "neovim",
     "ripgrep",
     "tmux",
     "trash-cli",
