@@ -1,0 +1,22 @@
+-- Names (glob) hidden from file explorers/pickers; everything else is shown.
+return {
+	".git",
+	"node_modules",
+	".venv",
+	"__pycache__",
+	".next",
+	".DS_Store",
+	".pytest_cache",
+	".mypy_cache",
+	".ruff_cache",
+	".cache",
+	".turbo",
+	"dist",
+	"target",
+	".gradle",
+	".terraform",
+	".idea",
+	"Thumbs.db",
+	"desktop.ini",
+	"*.pyc",
+}
