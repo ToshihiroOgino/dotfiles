@@ -22,7 +22,7 @@ PROMPT='$(git_custom_status)%{$fg[cyan]%}[%~% ]%{$reset_color%}
 
 export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 
-alias bat=batcat
+(( $+commands[batcat] )) && alias bat=batcat
 alias rm=trash
 alias nvim='NVIM_APPNAME=nvim-tshr nvim'
 alias lvim='NVIM_APPNAME=nvim command nvim'
