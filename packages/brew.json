@@ -1,13 +1,15 @@
 {
-  "buckets": null,
+  "buckets": [],
   "packages": [
     "bat",
     "cask:ghostty",
     "fd",
     "gh",
+    "ghostscript",
     "ghq",
     "git",
     "go",
+    "imagemagick",
     "kotlin",
     "lazygit",
     "lua",
