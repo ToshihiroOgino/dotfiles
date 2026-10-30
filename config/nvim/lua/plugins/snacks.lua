@@ -1,13 +1,6 @@
 -- Show dotfiles and gitignored files (e.g. logs/) everywhere;
 -- hide only what is listed in `exclude` (blacklist).
-local exclude = {
-  ".git/",
-  "node_modules/",
-  ".venv/",
-  "__pycache__/",
-  ".next/",
-  ".DS_Store",
-}
+local exclude = require("config.exclude")
 
 local function source()
   return { hidden = true, ignored = true, exclude = exclude }
