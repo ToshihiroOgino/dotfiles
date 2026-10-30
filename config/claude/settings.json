@@ -20,6 +20,7 @@
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
   "theme": "dark",
+  "outputStyle": "Concise",
   "hooks": {
     "UserPromptSubmit": [
       {
