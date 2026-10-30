@@ -1,0 +1,13 @@
+#!/bin/sh
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "warning: gitleaks not found, skipping secret scan" >&2
+  exit 0
+fi
+while read -r _ local_sha _ remote_sha; do
+  case $local_sha in *[!0]*) ;; *) continue ;; esac
+  case $remote_sha in
+  *[!0]*) range="$remote_sha..$local_sha" ;;
+  *) range="$local_sha --not --remotes=$1" ;;
+  esac
+  gitleaks git --log-opts="$range" --redact --no-banner -v || exit 1
+done
