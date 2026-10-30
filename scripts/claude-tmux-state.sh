@@ -1,6 +1,6 @@
 #!/bin/sh
 # Record Claude Code's state on the tmux pane so the window list can show it.
-# usage: claude-tmux-state working|waiting|done|seen|clear [pane_id]
+# usage: claude-tmux-state.sh working|waiting|done|seen|clear [pane_id]
 # States: working ◐ / waiting ○ / done ✓ (unchecked) / seen ● (checked)
 state=$1
 pane=${2:-$TMUX_PANE}

@@ -26,7 +26,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/dotfiles/tools/claude-tmux-state working"
+            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh working"
           }
         ]
       }
@@ -36,7 +36,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/dotfiles/tools/claude-tmux-state working"
+            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh working"
           }
         ]
       }
@@ -46,7 +46,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/dotfiles/tools/claude-tmux-state waiting"
+            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh waiting"
           }
         ]
       }
@@ -56,7 +56,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/dotfiles/tools/claude-tmux-state done"
+            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh done"
           }
         ]
       }
@@ -66,7 +66,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/dotfiles/tools/claude-tmux-state clear"
+            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh clear"
           }
         ]
       }
