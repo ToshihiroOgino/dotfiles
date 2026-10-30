@@ -21,6 +21,16 @@
   "tui": "fullscreen",
   "theme": "dark",
   "outputStyle": "Concise",
+  "permissions": {
+    "deny": [
+      "Bash(git*--no-verify*)",
+      "Bash(git commit* -n*)",
+      "Bash(git*core.hooksPath*)",
+      "Bash(git push*--force*)",
+      "Bash(git push* -f*)",
+      "Bash(git push* +*)"
+    ]
+  },
   "hooks": {
     "UserPromptSubmit": [
       {
