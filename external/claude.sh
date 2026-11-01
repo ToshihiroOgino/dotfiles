@@ -8,6 +8,8 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 PLATFORM=$(sh "$ROOT/scripts/os.sh")
 
 if [ "$PLATFORM" = windows ]; then
+  # Before the skip below: also applies to an existing install.
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(cygpath -w "$ROOT/external/git-bash-windows.ps1")"
   if command -v claude >/dev/null 2>&1 || [ -e "$HOME/.local/bin/claude.exe" ]; then
     echo "skip     claude (already installed)"
     exit 0

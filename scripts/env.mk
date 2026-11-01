@@ -6,8 +6,12 @@
 ENV_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
 ifeq ($(OS),Windows_NT)
-GIT_ROOT := $(abspath $(shell git --exec-path)/../../..)
-$(if $(wildcard $(GIT_ROOT)/usr/bin/sh.exe),,$(error Git for Windows not found: $(GIT_ROOT)/usr/bin/sh.exe))
+# Not abspath: it splits on spaces, which breaks C:/Program Files/Git.
+GIT_ROOT := $(subst \,/,$(shell git --exec-path))
+$(foreach e,mingw64 mingw32 ucrt64 clang64 clangarm64,$(eval GIT_ROOT := $$(patsubst %/$e/libexec/git-core,%,$$(GIT_ROOT))))
+# wildcard needs the spaces escaped too.
+GIT_SH := $(GIT_ROOT)/usr/bin/sh.exe
+$(if $(wildcard $(subst $() ,\ ,$(GIT_SH))),,$(error Git for Windows not found: $(GIT_SH)))
 export PATH := $(GIT_ROOT)/usr/bin;$(PATH)
 SHELL := $(GIT_ROOT)/usr/bin/sh.exe
 # pwsh/cmd do not define HOME.
