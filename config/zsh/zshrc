@@ -24,6 +24,7 @@ export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 
 (( $+commands[bat] )) || alias bat=batcat
 alias rm=trash
+alias sudo='sudo '
 alias nvim='NVIM_APPNAME=nvim-tshr nvim'
 alias lvim='NVIM_APPNAME=nvim command nvim'
 alias v=nvim
