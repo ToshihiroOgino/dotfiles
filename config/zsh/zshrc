@@ -27,6 +27,7 @@ alias rm=trash
 alias nvim='NVIM_APPNAME=nvim-tshr nvim'
 alias lvim='NVIM_APPNAME=nvim command nvim'
 alias v=nvim
+alias gcm=which
 
 export CMAKE_GENERATOR=Ninja
 export BAT_PAGER="less -RF --mouse"
