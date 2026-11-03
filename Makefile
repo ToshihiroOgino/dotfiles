@@ -5,7 +5,7 @@ include scripts/link.mk
 
 all: tools link external systemd-enable
 
-.PHONY: all ime pkgsync systemd-enable external nvim tree-sitter gitleaks omz claude tpm
+.PHONY: all ime pkgsync systemd-enable external nvim tree-sitter gitleaks omz claude tpm external-outdated
 
 # Built tools are linked into BIN, which is on PATH.
 BIN := $(HOME)/.local/bin
@@ -25,6 +25,9 @@ systemd-enable:
 	@sh $(SCRIPTS)systemd-enable.sh
 
 external: nvim tree-sitter gitleaks omz claude tpm
+
+external-outdated:
+	@sh scripts/external-outdated.sh
 
 nvim:
 	@sh external/nvim.sh

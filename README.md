@@ -15,6 +15,7 @@ make link            # link all configs for this OS
 make tools           # build the tools below and link them into ~/.local/bin
 make systemd-enable  # WSL only: enable systemd units
 make external        # fetch externally hosted tools and put them on PATH
+make external-outdated  # show pinned external tools that have a newer release
 ```
 
 ## Tools
