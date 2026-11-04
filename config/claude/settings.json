@@ -3,24 +3,6 @@
     "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
     "CLAUDE_CODE_SCROLL_SPEED": "3"
   },
-  "model": "sonnet",
-  "enabledPlugins": {
-    "lua-lsp@claude-plugins-official": true,
-    "clangd-lsp@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true
-  },
-  "modelSettings": {
-    "claude-sonnet-5": {
-      "effortLevel": "medium"
-    },
-    "claude-opus-5": {
-      "effortLevel": "high"
-    }
-  },
-  "autoUpdatesChannel": "latest",
-  "tui": "fullscreen",
-  "theme": "dark",
-  "outputStyle": "Concise",
   "permissions": {
     "deny": [
       "Bash(git*--no-verify*)",
@@ -37,8 +19,8 @@
         "hooks": [
           {
             "type": "command",
-            "shell": "bash",
-            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh working"
+            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh working",
+            "shell": "bash"
           }
         ]
       }
@@ -48,8 +30,8 @@
         "hooks": [
           {
             "type": "command",
-            "shell": "bash",
-            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh working"
+            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh working",
+            "shell": "bash"
           }
         ]
       }
@@ -59,8 +41,8 @@
         "hooks": [
           {
             "type": "command",
-            "shell": "bash",
-            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh waiting"
+            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh waiting",
+            "shell": "bash"
           }
         ]
       }
@@ -70,8 +52,8 @@
         "hooks": [
           {
             "type": "command",
-            "shell": "bash",
-            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh done"
+            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh done",
+            "shell": "bash"
           }
         ]
       }
@@ -81,11 +63,28 @@
         "hooks": [
           {
             "type": "command",
-            "shell": "bash",
-            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh clear"
+            "command": "$HOME/dotfiles/scripts/claude-tmux-state.sh clear",
+            "shell": "bash"
           }
         ]
       }
     ]
-  }
+  },
+  "enabledPlugins": {
+    "lua-lsp@claude-plugins-official": true,
+    "clangd-lsp@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true
+  },
+  "outputStyle": "Concise",
+  "modelSettings": {
+    "claude-sonnet-5": {
+      "effortLevel": "medium"
+    },
+    "claude-opus-5": {
+      "effortLevel": "high"
+    }
+  },
+  "autoUpdatesChannel": "latest",
+  "tui": "fullscreen",
+  "theme": "dark"
 }
