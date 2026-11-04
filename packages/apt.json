@@ -25,6 +25,7 @@
     "python3-venv",
     "ripgrep",
     "texlive-latex-base",
+    "texlive-latex-extra",
     "tmux",
     "trash-cli",
     "vim",
