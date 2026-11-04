@@ -1,0 +1,60 @@
+#!/bin/sh
+# GlobalProtect VPN client, through gpclient (globalprotect-openconnect).
+# The portal is the first line of gpvpn.conf, next to this script, that is
+# neither blank nor a comment (#). `up` runs gpclient in the background and
+# logs to $log.
+set -eu
+
+conf=$(dirname "$(readlink -f "$0")")/gpvpn.conf
+log=${XDG_STATE_HOME:-$HOME/.local/state}/gpvpn.log
+
+running() { pgrep -x gpclient >/dev/null; }
+
+portal() {
+	if [ ! -f "$conf" ]; then
+		echo "gpvpn: $conf not found (run make gpvpn)" >&2
+		exit 1
+	fi
+	p=$(grep -v -e '^[[:space:]]*#' -e '^[[:space:]]*$' "$conf" | head -n 1 | tr -d '[:space:]')
+	if [ -z "$p" ]; then
+		echo "gpvpn: no portal in $conf" >&2
+		exit 1
+	fi
+	printf '%s\n' "$p"
+}
+
+case "${1:-up}" in
+up)
+	if running; then
+		echo "gpvpn: already running (gpvpn down to stop)" >&2
+		exit 1
+	fi
+	p=$(portal)
+	# sudo-rs ignores -E, so pass what the login window needs by hand.
+	set --
+	for v in DISPLAY WAYLAND_DISPLAY XDG_RUNTIME_DIR; do
+		eval "val=\${$v-}"
+		if [ -n "$val" ]; then
+			set -- "$@" "$v=$val"
+		fi
+	done
+	mkdir -p "$(dirname "$log")"
+	: >"$log"
+	# sudo stays in the foreground for the password; only gpclient detaches.
+	sudo env "$@" sh -c 'nohup gpclient connect "$1" >>"$2" 2>&1 </dev/null &' sh "$p" "$log"
+	echo "gpvpn: connecting to $p in the background (log: $log)"
+	;;
+down) exec sudo gpclient disconnect ;;
+status)
+	if running; then
+		echo "gpvpn: running (log: $log)"
+	else
+		echo "gpvpn: not running"
+		exit 1
+	fi
+	;;
+*)
+	echo "usage: gpvpn [up|down|status]" >&2
+	exit 2
+	;;
+esac

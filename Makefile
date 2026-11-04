@@ -5,13 +5,13 @@ include scripts/link.mk
 
 all: tools link external systemd-enable
 
-.PHONY: all ime pkgsync systemd-enable external nvim tree-sitter gitleaks omz claude tpm external-outdated
+.PHONY: all ime pkgsync gpvpn systemd-enable external nvim tree-sitter gitleaks omz claude tpm external-outdated
 
 # Built tools are linked into BIN, which is on PATH.
 BIN := $(HOME)/.local/bin
 EXE := $(if $(filter windows,$(FAMILY)),.exe)
 
-tools: ime pkgsync
+tools: ime pkgsync $(if $(filter windows,$(FAMILY)),,gpvpn)
 
 ime:
 	"$(MAKE)" -C tools/ime build
@@ -20,6 +20,10 @@ ime:
 pkgsync:
 	"$(MAKE)" -C tools/pkgsync build
 	$(LINK) tools/pkgsync/pkgsync$(EXE) "$(BIN)/pkgsync$(EXE)"
+
+gpvpn:
+	$(LINK) tools/gpvpn/gpvpn "$(BIN)/gpvpn"
+	@[ -e tools/gpvpn/gpvpn.conf ] || { cp tools/gpvpn/templates/gpvpn.conf tools/gpvpn/gpvpn.conf && echo "create   tools/gpvpn/gpvpn.conf (from template)"; }
 
 systemd-enable:
 	@sh $(SCRIPTS)systemd-enable.sh

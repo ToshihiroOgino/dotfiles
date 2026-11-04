@@ -7,3 +7,6 @@
 
 # Per-machine state written by pkgsync.
 /packages/pending/
+
+# Machine-local VPN portal (made from tools/gpvpn/templates/).
+/tools/gpvpn/gpvpn.conf
