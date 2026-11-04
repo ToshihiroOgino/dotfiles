@@ -1,0 +1,3 @@
+#!/bin/sh
+# snacks.image only knows tectonic/pdflatex; route to lualatex so luatexja can typeset Japanese.
+exec lualatex "$@"
