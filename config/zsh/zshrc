@@ -24,7 +24,6 @@ export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 
 (( $+commands[bat] )) || alias bat=batcat
 alias rm=trash
-alias sudo='sudo '
 alias v=nvim
 alias gcm=which
 
