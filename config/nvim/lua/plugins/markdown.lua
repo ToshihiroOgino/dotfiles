@@ -1,11 +1,12 @@
-return {
-  {
-    "mfussenegger/nvim-lint",
-    opts = function()
-      local lint = require("lint")
-      local linter = lint.linters["markdownlint-cli2"]
-      local config = vim.fn.stdpath("config") .. "/markdownlint-cli2.yaml"
-      linter.args = vim.list_extend({ "--config", config }, linter.args or {})
-    end,
-  },
-}
+vim.pack.add({ "https://github.com/MeanderingProgrammer/render-markdown.nvim" }, { confirm = false })
+
+require("render-markdown").setup({
+	heading = {
+		-- Keep the '#' markers as they are instead of replacing them with icons.
+		icons = function(context)
+			return string.rep("#", context.level) .. " "
+		end,
+		position = "inline",
+		sign = false,
+	},
+})

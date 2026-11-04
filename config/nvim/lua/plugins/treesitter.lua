@@ -19,6 +19,7 @@ require("nvim-treesitter").install({
 	"tsx",
 	"make",
 	"regex",
+	"latex",
 })
 
 -- Highlighting is provided by nvim; start it per buffer (ignored when no parser exists).

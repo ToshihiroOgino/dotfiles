@@ -1,25 +1,4 @@
-# nvim-tshr
-
-Neovim config written from scratch, run with `NVIM_APPNAME=nvim-tshr`. Plugins are managed by the built-in `vim.pack`; `nvim-pack-lock.json` pins their revisions.
-
-## Requirements
-
-- Neovim 0.12 (`make nvim`)
-- git, curl, tar, a C compiler
-- tree-sitter CLI 0.26.1 or later (`make tree-sitter`)
-- node and npm (mason installs some language servers with npm)
-- lazygit, ripgrep, fd
-- ime (`make tools`), optional
-- trash-cli, optional: oil deletes to the trash when it is installed
-
-## Usage
-
-```sh
-make link-nvim-tshr   # link this directory to ~/.config/nvim-tshr
-nvim                  # alias for NVIM_APPNAME=nvim-tshr nvim (config/zsh/zshrc); lvim launches the LazyVim config (~/.config/nvim)
-```
-
-Language servers and tools listed in `lua/plugins/mason.lua` are installed in the background on startup.
+# nvim
 
 ## Keybinds
 
