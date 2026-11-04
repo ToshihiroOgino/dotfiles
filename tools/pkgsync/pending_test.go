@@ -33,7 +33,7 @@ func TestUpdateSummary(t *testing.T) {
 	if got := read(); got != "+2-1\n" {
 		t.Errorf("apt only: got %q", got)
 	}
-	put("scoop.diff", "+ bucket:extras\n+ x\n")
+	put("scoop.diff", "+ repo:extras\n+ x\n")
 	put("scoop.warn", "git: Held package\n")
 	if got := read(); got != "+4-1!1\n" {
 		t.Errorf("both managers: got %q", got)
@@ -76,7 +76,7 @@ func TestParseScoopExport(t *testing.T) {
 			}
 		}
 	}
-	eq("Buckets", s.Buckets, []string{"main"})
+	eq("Repos", s.Repos, []string{"main"})
 	eq("Packages", s.Packages, []string{"git", "held", "gheld", "glob"})
 	eq("External", s.External, []string{"auto", "url", "path"})
 	eq("Warnings", s.Warnings, []string{"gheld: Global install", "glob: Global install", "broken: Install failed"})

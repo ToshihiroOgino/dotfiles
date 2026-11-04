@@ -61,9 +61,13 @@ func useFake(t *testing.T, ms []Manager, out map[string]string) *fake {
 		return []byte(s), nil
 	}
 	detect = func() []Manager { return ms }
-	oldInit := aptInitialStatus
+	oldInit, oldSources := aptInitialStatus, aptSourcesDir
 	aptInitialStatus = filepath.Join(t.TempDir(), "missing.gz")
-	t.Cleanup(func() { output, detect, aptInitialStatus = oldOut, oldDetect, oldInit })
+	aptSourcesDir = filepath.Join(t.TempDir(), "missing")
+	t.Cleanup(func() {
+		output, detect = oldOut, oldDetect
+		aptInitialStatus, aptSourcesDir = oldInit, oldSources
+	})
 	return f
 }
 
@@ -201,8 +205,8 @@ func TestApplyAddsAndDropsAndClearsPending(t *testing.T) {
 	if tr.Comment != "keep me" || !reflect.DeepEqual(tr.Ignore, []string{"lib*", "!libfoo"}) {
 		t.Errorf("comment/ignore lost: %+v", tr)
 	}
-	if tr.Buckets != nil {
-		t.Errorf("apt must not get a buckets key: %v", *tr.Buckets)
+	if tr.Repos == nil || len(tr.Repos) != 0 {
+		t.Errorf("apt must get an empty repos list: %v", tr.Repos)
 	}
 	// apply clears the pending files, so the prompt updates at once.
 	for _, n := range []string{"apt.diff", "summary"} {
@@ -227,7 +231,7 @@ func TestIgnoredTrackedEntryIsNotReportedRemoved(t *testing.T) {
 	}
 }
 
-func TestScoopAddWritesBucketsAndWarns(t *testing.T) {
+func TestScoopAddWritesReposAndWarns(t *testing.T) {
 	root := t.TempDir()
 	useFake(t, []Manager{scoop{}}, map[string]string{"scoop export": scoopOut})
 
@@ -235,8 +239,8 @@ func TestScoopAddWritesBucketsAndWarns(t *testing.T) {
 		t.Fatal(err)
 	}
 	tr := readTracked(t, root, "scoop")
-	if tr.Buckets == nil || !reflect.DeepEqual(*tr.Buckets, []string{"extras", "main"}) {
-		t.Errorf("Buckets = %v", tr.Buckets)
+	if !reflect.DeepEqual(tr.Repos, []string{"extras", "main"}) {
+		t.Errorf("Repos = %v", tr.Repos)
 	}
 	if want := []string{"git", "held"}; !reflect.DeepEqual(tr.Packages, want) {
 		t.Errorf("Packages = %q, want %q", tr.Packages, want)
@@ -265,7 +269,7 @@ func TestSummaryCombinesManagers(t *testing.T) {
 	if err := cmdDiff(root, true); err != nil {
 		t.Fatal(err)
 	}
-	// apt: 4 packages; scoop: 2 buckets + 2 apps, and 1 warning.
+	// apt: 4 packages; scoop: 2 repos + 2 apps, and 1 warning.
 	if got := pending(root, "summary"); got != "+8!1\n" {
 		t.Errorf("summary = %q, want %q", got, "+8!1\n")
 	}
@@ -436,8 +440,8 @@ func TestApplyFailsWhileLocked(t *testing.T) {
 }
 
 func TestInstallHints(t *testing.T) {
-	d := Diff{DelPkgs: []string{"a", "b"}, DelBuckets: []string{"extras"}, AddPkgs: []string{"x"}}
-	if got, want := (apt{}).InstallHints(d), []string{"sudo apt install a b"}; !reflect.DeepEqual(got, want) {
+	d := Diff{DelPkgs: []string{"a", "b"}, DelRepos: []string{"extras"}, AddPkgs: []string{"x"}}
+	if got, want := (apt{}).InstallHints(Diff{DelPkgs: []string{"a", "b"}, DelRepos: []string{"ppa:o/n"}}), []string{"sudo add-apt-repository -y ppa:o/n", "sudo apt install a b"}; !reflect.DeepEqual(got, want) {
 		t.Errorf("apt = %q, want %q", got, want)
 	}
 	if got := (apt{}).InstallHints(Diff{AddPkgs: []string{"x"}}); len(got) != 0 {
@@ -450,12 +454,12 @@ func TestInstallHints(t *testing.T) {
 }
 
 func TestDiffFormat(t *testing.T) {
-	d := Diff{AddPkgs: []string{"a"}, DelPkgs: []string{"b"}, AddBuckets: []string{"x"}}
-	plain := "+ bucket:x\n+ a\n- b\n"
+	d := Diff{AddPkgs: []string{"a"}, DelPkgs: []string{"b"}, AddRepos: []string{"x"}}
+	plain := "+ repo:x\n+ a\n- b\n"
 	if got := d.String(); got != plain {
 		t.Errorf("String() = %q, want %q", got, plain)
 	}
-	want := "\x1b[32m+ bucket:x\x1b[0m\n\x1b[32m+ a\x1b[0m\n\x1b[31m- b\x1b[0m\n"
+	want := "\x1b[32m+ repo:x\x1b[0m\n\x1b[32m+ a\x1b[0m\n\x1b[31m- b\x1b[0m\n"
 	if got := d.format(true); got != want {
 		t.Errorf("colored = %q, want %q", got, want)
 	}
@@ -492,10 +496,10 @@ func TestInit(t *testing.T) {
 		}
 		return string(b)
 	}
-	if got, want := read("apt.json"), "{\n  \"packages\": [],\n  \"ignore\": []\n}\n"; got != want {
+	if got, want := read("apt.json"), "{\n  \"repos\": [],\n  \"packages\": [],\n  \"ignore\": []\n}\n"; got != want {
 		t.Errorf("apt.json = %q, want %q", got, want)
 	}
-	if got, want := read("scoop.json"), "{\n  \"buckets\": [],\n  \"packages\": [],\n  \"ignore\": []\n}\n"; got != want {
+	if got, want := read("scoop.json"), "{\n  \"repos\": [],\n  \"packages\": [],\n  \"ignore\": []\n}\n"; got != want {
 		t.Errorf("scoop.json = %q, want %q", got, want)
 	}
 
@@ -600,26 +604,26 @@ func TestBrewSnapshotAndHints(t *testing.T) {
 	if want := []string{"bat", "hashicorp/tap/terraform", "cask:ghostty"}; !reflect.DeepEqual(s.Packages, want) {
 		t.Errorf("packages = %v, want %v", s.Packages, want)
 	}
-	if want := []string{"hashicorp/tap"}; !reflect.DeepEqual(s.Buckets, want) {
-		t.Errorf("buckets = %v, want %v", s.Buckets, want)
+	if want := []string{"hashicorp/tap"}; !reflect.DeepEqual(s.Repos, want) {
+		t.Errorf("repos = %v, want %v", s.Repos, want)
 	}
-	got := brew{}.InstallHints(Diff{DelPkgs: []string{"bat", "cask:ghostty"}, DelBuckets: []string{"x/y"}})
+	got := brew{}.InstallHints(Diff{DelPkgs: []string{"bat", "cask:ghostty"}, DelRepos: []string{"x/y"}})
 	want := []string{"brew tap x/y", "brew install bat", "brew install --cask ghostty"}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("hints = %v, want %v", got, want)
 	}
 }
 
-func TestIgnoreAppliesToBuckets(t *testing.T) {
-	for _, m := range []Manager{scoop{}, brew{}} {
+func TestIgnoreAppliesToRepos(t *testing.T) {
+	for _, m := range []Manager{apt{}, scoop{}, brew{}} {
 		d, err := compare(m,
-			Tracked{Buckets: &[]string{"gone"}, Ignore: []string{"extras", "gone"}},
-			Snapshot{Buckets: []string{"main", "extras"}})
+			Tracked{Repos: []string{"gone"}, Ignore: []string{"extras", "gone"}},
+			Snapshot{Repos: []string{"main", "extras"}})
 		if err != nil {
 			t.Fatal(err)
 		}
-		if want := []string{"main"}; !reflect.DeepEqual(d.AddBuckets, want) || len(d.DelBuckets) != 0 {
-			t.Errorf("%s: add=%v del=%v", m.Name(), d.AddBuckets, d.DelBuckets)
+		if want := []string{"main"}; !reflect.DeepEqual(d.AddRepos, want) || len(d.DelRepos) != 0 {
+			t.Errorf("%s: add=%v del=%v", m.Name(), d.AddRepos, d.DelRepos)
 		}
 	}
 }
@@ -685,5 +689,31 @@ func TestThrottledRunSkipsTheLock(t *testing.T) {
 	// The stamp is fresh, so no lock is needed.
 	if err := cmdDiff(root, true); err != nil {
 		t.Errorf("throttled run failed while locked: %v", err)
+	}
+}
+
+func TestAptPPAs(t *testing.T) {
+	useFake(t, nil, aptCmds())
+	dir := t.TempDir()
+	aptSourcesDir = dir
+	files := map[string]string{
+		"ubuntu.sources": "Types: deb\nURIs: http://archive.ubuntu.com/ubuntu/\nSuites: noble\n",
+		"a.sources": "Types: deb\nURIs: https://ppa.launchpadcontent.net/yuezk/globalprotect-openconnect/ubuntu/\nSuites: noble\n\n" +
+			"Types: deb\nEnabled: no\nURIs: https://ppa.launchpadcontent.net/off/stanza/ubuntu/\nSuites: noble\n",
+		"b.list":    "# deb http://ppa.launchpad.net/commented/out/ubuntu noble main\ndeb [arch=amd64 signed-by=/k.gpg] http://ppa.launchpad.net/old/style/ubuntu noble main\n",
+		"c.list":    "deb https://download.example.com/linux stable main\n",
+		"d.sources": "URIs: https://ppa.launchpadcontent.net/yuezk/globalprotect-openconnect/ubuntu\n",
+	}
+	for n, c := range files {
+		if err := os.WriteFile(filepath.Join(dir, n), []byte(c), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	s, err := apt{}.Snapshot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := []string{"ppa:old/style", "ppa:yuezk/globalprotect-openconnect"}; !reflect.DeepEqual(s.Repos, want) {
+		t.Errorf("Repos = %q, want %q", s.Repos, want)
 	}
 }

@@ -35,4 +35,4 @@ with the output redirected.
 
 - Linux (apt)
 - Windows (scoop)
-- macOS (Homebrew: formulae from `brew leaves`, casks as `cask:<name>`, taps as buckets)
+- macOS (Homebrew: formulae from `brew leaves`, casks as `cask:<name>`, taps as repos)

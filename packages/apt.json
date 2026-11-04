@@ -1,4 +1,7 @@
 {
+  "repos": [
+    "ppa:yuezk/globalprotect-openconnect"
+  ],
   "packages": [
     "bat",
     "build-essential",
@@ -13,6 +16,7 @@
     "ghostscript",
     "ghostty",
     "git",
+    "globalprotect-openconnect",
     "golang",
     "imagemagick",
     "lazygit",

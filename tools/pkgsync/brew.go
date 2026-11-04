@@ -9,9 +9,8 @@ const caskPrefix = "cask:"
 
 type brew struct{}
 
-func (brew) Name() string     { return "brew" }
-func (brew) HasBuckets() bool { return true }
-func (brew) Available() bool  { return available("brew") }
+func (brew) Name() string    { return "brew" }
+func (brew) Available() bool { return available("brew") }
 
 func (brew) Snapshot() (Snapshot, error) {
 	taps, err := output("brew", "tap")
@@ -27,7 +26,7 @@ func (brew) Snapshot() (Snapshot, error) {
 		return Snapshot{}, err
 	}
 
-	s := Snapshot{Buckets: lines(taps), Packages: lines(leaves)}
+	s := Snapshot{Repos: lines(taps), Packages: lines(leaves)}
 	for _, c := range lines(casks) {
 		s.Packages = append(s.Packages, caskPrefix+c)
 	}
@@ -36,7 +35,7 @@ func (brew) Snapshot() (Snapshot, error) {
 
 func (brew) InstallHints(d Diff) []string {
 	var cmds []string
-	for _, t := range d.DelBuckets {
+	for _, t := range d.DelRepos {
 		cmds = append(cmds, "brew tap "+t)
 	}
 	var formulae, casks []string

@@ -1,5 +1,5 @@
 {
-  "buckets": null,
+  "repos": [],
   "packages": [
     "bat",
     "cask:ghostty",

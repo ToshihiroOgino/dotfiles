@@ -8,9 +8,8 @@ import (
 
 type scoop struct{}
 
-func (scoop) Name() string     { return "scoop" }
-func (scoop) HasBuckets() bool { return true }
-func (scoop) Available() bool  { return available("scoop") }
+func (scoop) Name() string    { return "scoop" }
+func (scoop) Available() bool { return available("scoop") }
 
 func (scoop) Snapshot() (Snapshot, error) {
 	out, err := output("scoop", "export")
@@ -35,7 +34,7 @@ func parseScoopExport(out []byte) (Snapshot, error) {
 
 	var s Snapshot
 	for _, b := range exp.Buckets {
-		s.Buckets = append(s.Buckets, b.Name)
+		s.Repos = append(s.Repos, b.Name)
 	}
 	for _, a := range exp.Apps {
 		// Info is empty for a plain install; anything else (global, failed,
@@ -59,7 +58,7 @@ func parseScoopExport(out []byte) (Snapshot, error) {
 
 func (scoop) InstallHints(d Diff) []string {
 	var cmds []string
-	for _, b := range d.DelBuckets {
+	for _, b := range d.DelRepos {
 		cmds = append(cmds, "scoop bucket add "+b)
 	}
 	if len(d.DelPkgs) > 0 {

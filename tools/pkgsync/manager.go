@@ -10,7 +10,7 @@ import (
 // Snapshot is what a package manager reports for this machine.
 type Snapshot struct {
 	Packages  []string
-	Buckets   []string // only for managers with HasBuckets
+	Repos     []string // buckets (scoop), taps (brew), PPAs (apt)
 	External  []string // installed from outside the repositories; not tracked
 	Initial   []string // installed by the OS installer; not tracked, but present
 	Installed []string // every installed package, auto-installed ones included; only for presence
@@ -20,10 +20,9 @@ type Snapshot struct {
 type Manager interface {
 	Name() string
 	Available() bool
-	HasBuckets() bool
 	Snapshot() (Snapshot, error)
 	// InstallHints returns commands that would install what d.DelPkgs and
-	// d.DelBuckets list: tracked, but missing here. They are only printed.
+	// d.DelRepos list: tracked, but missing here. They are only printed.
 	InstallHints(d Diff) []string
 }
 

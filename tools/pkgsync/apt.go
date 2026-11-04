@@ -4,7 +4,10 @@ import (
 	"bufio"
 	"compress/gzip"
 	"os"
+	"path/filepath"
+	"regexp"
 	"runtime"
+	"sort"
 	"strings"
 )
 
@@ -57,11 +60,90 @@ func initialPackages() map[string]bool {
 	return set
 }
 
+// aptSourcesDir holds the apt source files. It is a variable so that tests
+// can substitute it.
+var aptSourcesDir = "/etc/apt/sources.list.d"
+
+var ppaURI = regexp.MustCompile(`^https?://ppa\.(?:launchpadcontent|launchpad)\.net/([^/]+)/([^/]+)/ubuntu/?$`)
+
+// ppas returns the enabled PPAs as "ppa:owner/name", from both the deb822
+// (*.sources) and the one-line (*.list) formats. Other repositories are not
+// reported.
+func ppas() []string {
+	set := map[string]bool{}
+	add := func(uri string) {
+		if m := ppaURI.FindStringSubmatch(uri); m != nil {
+			set["ppa:"+m[1]+"/"+m[2]] = true
+		}
+	}
+
+	sources, _ := filepath.Glob(filepath.Join(aptSourcesDir, "*.sources"))
+	for _, p := range sources {
+		b, err := os.ReadFile(p)
+		if err != nil {
+			continue
+		}
+		// Stanzas are separated by blank lines; "Enabled: no" turns one off.
+		for _, stanza := range strings.Split(strings.ReplaceAll(string(b), "\r\n", "\n"), "\n\n") {
+			var uris []string
+			enabled := true
+			for _, l := range strings.Split(stanza, "\n") {
+				k, v, ok := strings.Cut(l, ":")
+				if !ok || strings.HasPrefix(l, "#") {
+					continue
+				}
+				switch strings.ToLower(strings.TrimSpace(k)) {
+				case "uris":
+					uris = append(uris, strings.Fields(v)...)
+				case "enabled":
+					enabled = strings.TrimSpace(v) != "no"
+				}
+			}
+			if enabled {
+				for _, u := range uris {
+					add(u)
+				}
+			}
+		}
+	}
+
+	list, _ := filepath.Glob(filepath.Join(aptSourcesDir, "*.list"))
+	for _, p := range list {
+		b, err := os.ReadFile(p)
+		if err != nil {
+			continue
+		}
+		for _, l := range lines(b) {
+			f := strings.Fields(l)
+			if len(f) < 2 || f[0] != "deb" {
+				continue
+			}
+			// Skip the options, as in "deb [arch=amd64] URI suite".
+			i := 1
+			if strings.HasPrefix(f[i], "[") {
+				for i < len(f) && !strings.HasSuffix(f[i], "]") {
+					i++
+				}
+				i++
+			}
+			if i < len(f) {
+				add(f[i])
+			}
+		}
+	}
+
+	out := make([]string, 0, len(set))
+	for x := range set {
+		out = append(out, x)
+	}
+	sort.Strings(out)
+	return out
+}
+
 type apt struct{}
 
-func (apt) Name() string     { return "apt" }
-func (apt) HasBuckets() bool { return false }
-func (apt) Available() bool  { return runtime.GOOS == "linux" && available("apt-mark") }
+func (apt) Name() string    { return "apt" }
+func (apt) Available() bool { return runtime.GOOS == "linux" && available("apt-mark") }
 
 func (apt) Snapshot() (Snapshot, error) {
 	manual, err := output("apt-mark", "showmanual")
@@ -98,7 +180,7 @@ func (apt) Snapshot() (Snapshot, error) {
 	}
 
 	initial := initialPackages()
-	s := Snapshot{Installed: all}
+	s := Snapshot{Installed: all, Repos: ppas()}
 	for _, name := range lines(manual) {
 		if initial[name] {
 			s.Initial = append(s.Initial, name)
@@ -114,8 +196,12 @@ func (apt) Snapshot() (Snapshot, error) {
 }
 
 func (apt) InstallHints(d Diff) []string {
-	if len(d.DelPkgs) == 0 {
-		return nil
+	var cmds []string
+	for _, r := range d.DelRepos {
+		cmds = append(cmds, "sudo add-apt-repository -y "+r)
 	}
-	return []string{"sudo apt install " + strings.Join(d.DelPkgs, " ")}
+	if len(d.DelPkgs) > 0 {
+		cmds = append(cmds, "sudo apt install "+strings.Join(d.DelPkgs, " "))
+	}
+	return cmds
 }

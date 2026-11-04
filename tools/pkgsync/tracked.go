@@ -13,13 +13,13 @@ import (
 	"strings"
 )
 
-// Tracked is packages/<mgr>.json. Buckets is a pointer so that an empty list
-// is written for scoop and the key is omitted for apt.
+// Tracked is packages/<mgr>.json. Repos are the extra package sources:
+// buckets (scoop), taps (brew), PPAs (apt).
 type Tracked struct {
-	Comment  string    `json:"comment,omitempty"`
-	Buckets  *[]string `json:"buckets,omitempty"`
-	Packages []string  `json:"packages"`
-	Ignore   []string  `json:"ignore"`
+	Comment  string   `json:"comment,omitempty"`
+	Repos    []string `json:"repos"`
+	Packages []string `json:"packages"`
+	Ignore   []string `json:"ignore"`
 }
 
 func trackedPath(root string, m Manager) string {
@@ -47,8 +47,8 @@ func loadTracked(root string, m Manager) (Tracked, error) {
 }
 
 func saveTracked(root string, m Manager, t Tracked) error {
-	if m.HasBuckets() && t.Buckets == nil {
-		t.Buckets = &[]string{}
+	if t.Repos == nil {
+		t.Repos = []string{}
 	}
 	if t.Packages == nil {
 		t.Packages = []string{}
@@ -72,12 +72,12 @@ func saveTracked(root string, m Manager, t Tracked) error {
 
 // Diff is the difference between this machine and the tracked list.
 type Diff struct {
-	AddPkgs, DelPkgs       []string
-	AddBuckets, DelBuckets []string
+	AddPkgs, DelPkgs   []string
+	AddRepos, DelRepos []string
 }
 
 func (d Diff) Empty() bool {
-	return len(d.AddPkgs)+len(d.DelPkgs)+len(d.AddBuckets)+len(d.DelBuckets) == 0
+	return len(d.AddPkgs)+len(d.DelPkgs)+len(d.AddRepos)+len(d.DelRepos) == 0
 }
 
 // String is the plain form written to packages/pending/*.diff.
@@ -90,8 +90,8 @@ func (d Diff) format(p painter) string {
 			fmt.Fprintln(&sb, p.paint(code, sign+" "+prefix+x))
 		}
 	}
-	lines("+", green, "bucket:", d.AddBuckets)
-	lines("-", red, "bucket:", d.DelBuckets)
+	lines("+", green, "repo:", d.AddRepos)
+	lines("-", red, "repo:", d.DelRepos)
 	lines("+", green, "", d.AddPkgs)
 	lines("-", red, "", d.DelPkgs)
 	return sb.String()
@@ -122,28 +122,15 @@ func compare(m Manager, t Tracked, s Snapshot) (Diff, error) {
 	// Auto-installed packages are not reported as manual, but are present.
 	present = append(present, keep(s.Installed)...)
 	d.AddPkgs, d.DelPkgs = minus(cur, tr), minus(tr, present)
-	if m.HasBuckets() {
-		tb := keep(t.bucketList())
-		s.Buckets = keep(s.Buckets)
-		d.AddBuckets, d.DelBuckets = minus(s.Buckets, tb), minus(tb, s.Buckets)
-	}
+	curRepos, trRepos := keep(s.Repos), keep(t.Repos)
+	d.AddRepos, d.DelRepos = minus(curRepos, trRepos), minus(trRepos, curRepos)
 	return d, nil
-}
-
-func (t Tracked) bucketList() []string {
-	if t.Buckets == nil {
-		return nil
-	}
-	return *t.Buckets
 }
 
 // apply folds d into t: additions and removals.
 func apply(t *Tracked, d Diff) {
 	t.Packages = minus(merge(t.Packages, d.AddPkgs), d.DelPkgs)
-	if t.Buckets != nil || len(d.AddBuckets) > 0 {
-		b := minus(merge(t.bucketList(), d.AddBuckets), d.DelBuckets)
-		t.Buckets = &b
-	}
+	t.Repos = minus(merge(t.Repos, d.AddRepos), d.DelRepos)
 }
 
 // minus returns the sorted elements of a that are not in b.
