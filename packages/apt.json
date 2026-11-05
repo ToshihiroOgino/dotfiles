@@ -58,6 +58,7 @@
     "!lib*-dev",
     "google-chrome-stable",
     "keepassxc",
-    "syncthing"
+    "syncthing",
+    "ppa:ubuntusway-dev/stable"
   ]
 }
