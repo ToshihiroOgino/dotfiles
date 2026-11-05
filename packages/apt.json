@@ -32,6 +32,7 @@
     "texlive-latex-base",
     "texlive-latex-extra",
     "texlive-luatex",
+    "tio",
     "tmux",
     "trash-cli",
     "vim",
@@ -59,6 +60,7 @@
     "google-chrome-stable",
     "keepassxc",
     "syncthing",
-    "ppa:ubuntusway-dev/stable"
+    "ppa:ubuntusway-dev/stable",
+    "flatpak"
   ]
 }
