@@ -13,6 +13,7 @@
       "Bash(git push* +*)"
     ]
   },
+  "model": "opus",
   "hooks": {
     "UserPromptSubmit": [
       {
