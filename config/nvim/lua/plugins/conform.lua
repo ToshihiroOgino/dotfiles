@@ -7,6 +7,7 @@ require("conform").setup({
 	formatters_by_ft = {
 		lua = { "stylua" },
 		sh = { "shfmt" },
+		python = { "ruff_organize_imports", "ruff_format" },
 		markdown = { "prettier" },
 		yaml = { "prettier" },
 		json = { "biome" },
