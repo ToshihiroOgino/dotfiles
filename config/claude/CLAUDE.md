@@ -8,3 +8,4 @@
 - sudoとか管理者権限が不要な場合でも、勝手にアプリやパッケージをインストールしたりしないで。(scoopやAURヘルパなど)
 - DO NOT EDIT SYSTEM SETTING WITHOUT ASK PERMISSION OR APPROVAL FROM USER
 - 返答の際に、理由や具体例などを語る必要はない。ユーザから問われたときだけ説明して
+- Pull RequestやIssueの文面は必要最小限にする。人間が読むことを考慮すること。そこまで一般的でない略称などはなるべく含まないように
