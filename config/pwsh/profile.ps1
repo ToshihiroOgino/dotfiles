@@ -8,7 +8,10 @@ if ($isElevated -and "${function:prompt}" -notmatch '__basePrompt') {
 }
 
 # Shows pending package changes in the prompt. Needs `make pkgsync`.
-$pkgsyncPs1 = Join-Path ($env:PKGSYNC_ROOT ?? (Join-Path $HOME 'dotfiles')) 'tools\pkgsync\pkgsync.ps1'
+# The repo root is found from this file's real path (the profile is a symlink).
+$profileFile = Get-Item $PSCommandPath
+$env:PKGSYNC_ROOT ??= Split-Path (Split-Path (Split-Path ($profileFile.LinkTarget ?? $profileFile.FullName)))
+$pkgsyncPs1 = Join-Path $env:PKGSYNC_ROOT 'tools\pkgsync\pkgsync.ps1'
 if (Test-Path $pkgsyncPs1) { . $pkgsyncPs1 }
 
 # Import-Module yarn-completion

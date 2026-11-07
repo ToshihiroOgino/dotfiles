@@ -9,7 +9,10 @@ LINK := sh $(SCRIPTS)link.sh
 # For machine-local files: created from templates/ when missing.
 LINK_LOCAL := $(LINK) --local
 
-COMMON        := git claude tmux nvim vim lazygit alacritty herdr
+# Commands are linked into BIN, so configs refer to them without the repo path.
+BIN := $(HOME)/.local/bin
+
+COMMON        := git claude tmux nvim vim lazygit alacritty
 TOOLS_wsl     := $(COMMON) ghostty wsl zsh
 TOOLS_linux   := $(COMMON) ghostty zsh
 TOOLS_mac     := $(COMMON) ghostty zsh
@@ -26,7 +29,9 @@ link-git:
 	@[ -e "$(HOME)/.gitconfig" ] || { : >"$(HOME)/.gitconfig" && echo "create   $(HOME)/.gitconfig (empty)"; }
 link-claude:
 	$(LINK) config/claude "$(HOME)/.claude"
+	$(LINK) scripts/claude-tmux-state.sh "$(BIN)/claude-tmux-state"
 link-tmux:
+	$(LINK) scripts/claude-tmux-state.sh "$(BIN)/claude-tmux-state"
 	$(LINK) config/tmux/tmux.conf "$(HOME)/.tmux.conf"
 	$(LINK_LOCAL) config/tmux/tmux.local.conf "$(HOME)/.tmux.local.conf"
 
@@ -48,11 +53,6 @@ LAZYGIT_windows := $(APPDATA)/lazygit/config.yml
 link-lazygit:
 	$(LINK) config/lazygit/config.yml "$(LAZYGIT_$(FAMILY))"
 
-HERDR_DST_unix    := $(HOME)/.config/herdr/config.toml
-HERDR_DST_windows := $(APPDATA)/herdr/config.toml
-link-herdr:
-	$(LINK) config/herdr/config.toml "$(HERDR_DST_$(FAMILY))"
-
 ALACRITTY_DIR_unix    := $(HOME)/.config/alacritty
 ALACRITTY_DIR_windows := $(APPDATA)/alacritty
 link-alacritty:
@@ -67,6 +67,7 @@ link-ghostty:
 # Run `make systemd-enable` once to start fcitx5.service at login.
 link-wsl:
 	$(LINK) config/wsl/zshenv "$(HOME)/.zshenv"
+	$(LINK) scripts/wsl-browser.sh "$(BIN)/wsl-browser"
 	$(LINK) config/wsl/systemd/fcitx5.service "$(HOME)/.config/systemd/user/fcitx5.service"
 
 link-pwsh:

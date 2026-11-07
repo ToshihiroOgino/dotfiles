@@ -7,8 +7,6 @@ all: tools link external systemd-enable
 
 .PHONY: all ime pkgsync gpvpn systemd-enable external nvim tree-sitter gitleaks omz claude tpm external-outdated
 
-# Built tools are linked into BIN, which is on PATH.
-BIN := $(HOME)/.local/bin
 EXE := $(if $(filter windows,$(FAMILY)),.exe)
 
 tools: ime pkgsync $(if $(filter windows,$(FAMILY)),,gpvpn)

@@ -11,4 +11,4 @@ export EGL_LOG_LEVEL=fatal
 export GALLIUM_DRIVER=d3d12
 
 # Open URLs in the Windows default browser (xdg-open / gh honor $BROWSER)
-export BROWSER="$HOME/dotfiles/scripts/wsl-browser.sh"
+export BROWSER="$HOME/.local/bin/wsl-browser"
