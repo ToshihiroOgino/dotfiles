@@ -1,6 +1,6 @@
 # Shows pending package changes in the prompt. Needs `make pkgsync`.
 # The repo root is found from this file's real path (~/.zshrc is a symlink).
-: ${PKGSYNC_ROOT:=${${(%):-%x}:A:h:h:h}}
+export PKGSYNC_ROOT=${PKGSYNC_ROOT:-${${(%):-%x}:A:h:h:h}}
 _pkgsync_zsh="$PKGSYNC_ROOT/tools/pkgsync/pkgsync.zsh"
 [[ -r $_pkgsync_zsh ]] && source "$_pkgsync_zsh"
 
@@ -26,7 +26,11 @@ fi
 export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 
 (( $+commands[bat] )) || alias bat=batcat
-(( $+commands[trash] )) && alias rm=trash
+if (( $+commands[trash] )); then
+  alias rm=trash
+else
+  print -u2 "warning: trash-cli not found, rm deletes permanently"
+fi
 alias v=nvim
 alias gcm=which
 

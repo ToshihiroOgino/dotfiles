@@ -20,18 +20,19 @@ TOOLS_windows := $(COMMON) pwsh
 
 ALL_TOOLS := $(sort $(TOOLS_wsl) $(TOOLS_linux) $(TOOLS_mac) $(TOOLS_windows))
 
-.PHONY: link $(addprefix link-,$(ALL_TOOLS))
+.PHONY: link link-claude-tmux-state $(addprefix link-,$(ALL_TOOLS))
 
 link: $(addprefix link-,$(TOOLS_$(PLATFORM)))
 
 link-git:
 	$(LINK) config/git "$(HOME)/.config/git"
 	@[ -e "$(HOME)/.gitconfig" ] || { : >"$(HOME)/.gitconfig" && echo "create   $(HOME)/.gitconfig (empty)"; }
-link-claude:
+# Used by both the Claude hooks and tmux.
+link-claude-tmux-state:
+	$(LINK) scripts/claude-tmux-state.sh "$(BIN)/claude-tmux-state"
+link-claude: link-claude-tmux-state
 	$(LINK) config/claude "$(HOME)/.claude"
-	$(LINK) scripts/claude-tmux-state.sh "$(BIN)/claude-tmux-state"
-link-tmux:
-	$(LINK) scripts/claude-tmux-state.sh "$(BIN)/claude-tmux-state"
+link-tmux: link-claude-tmux-state
 	$(LINK) config/tmux/tmux.conf "$(HOME)/.tmux.conf"
 	$(LINK_LOCAL) config/tmux/tmux.local.conf "$(HOME)/.tmux.local.conf"
 
