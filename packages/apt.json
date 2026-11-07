@@ -3,6 +3,7 @@
     "ppa:yuezk/globalprotect-openconnect"
   ],
   "packages": [
+    "avahi-daemon",
     "bat",
     "build-essential",
     "clang-format",
