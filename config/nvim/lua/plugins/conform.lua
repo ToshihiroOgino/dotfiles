@@ -1,9 +1,7 @@
 vim.pack.add({ "https://github.com/stevearc/conform.nvim" }, { confirm = false })
 
--- Formatter names are conform's; the mason packages are listed in mason.lua.
--- Filetypes without an entry (go, toml) fall back to their LSP via
--- require("conform").format({ lsp_format = "fallback" }).
 require("conform").setup({
+	default_format_opts = { lsp_format = "fallback" },
 	formatters_by_ft = {
 		lua = { "stylua" },
 		sh = { "shfmt" },
@@ -14,5 +12,7 @@ require("conform").setup({
 		jsonc = { "biome" },
 		javascript = { "biome" },
 		typescript = { "biome" },
+		["*"] = { "trim_whitespace" },
+		["_"] = { lsp_format = "first" },
 	},
 })

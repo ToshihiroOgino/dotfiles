@@ -18,7 +18,7 @@ vim.keymap.set("n", "<leader>gg", function()
 	Snacks.lazygit()
 end, { desc = "Lazygit" })
 vim.keymap.set({ "n", "x" }, "<leader>cf", function()
-	require("conform").format({ lsp_format = "fallback" })
+	require("conform").format()
 end, { desc = "Format" })
 
 vim.api.nvim_create_autocmd("LspAttach", {

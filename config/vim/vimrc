@@ -12,6 +12,8 @@ set nowritebackup
 set scrolloff=5
 set whichwrap+=h,l,<,>,[,]
 set spelllang=en,cjk
+set list
+set listchars=tab:»\ ,trail:·,lead:·,nbsp:␣
 
 " Machine-local overrides.
 silent! source ~/.vimrc.local
