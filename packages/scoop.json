@@ -35,6 +35,7 @@
     "vim",
     "volta",
     "vscode",
+    "win32yank",
     "yt-dlp"
   ],
   "ignore": []
