@@ -62,6 +62,7 @@
     "keepassxc",
     "syncthing",
     "ppa:ubuntusway-dev/stable",
-    "flatpak"
+    "flatpak",
+    "postgresql-client"
   ]
 }
