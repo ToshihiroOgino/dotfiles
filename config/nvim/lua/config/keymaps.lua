@@ -17,6 +17,17 @@ vim.keymap.set("n", "<leader>e", "<Cmd>Oil<CR>", { desc = "Open parent directory
 vim.keymap.set("n", "<leader>gg", function()
 	Snacks.lazygit()
 end, { desc = "Lazygit" })
+vim.keymap.set("n", "<leader>gd", "<Cmd>DiffviewOpen<CR>", { desc = "Diffview: working tree" })
+vim.keymap.set("n", "<leader>gm", function()
+	local base = vim.fn.systemlist({ "git", "rev-parse", "--abbrev-ref", "origin/HEAD" })[1]
+	if vim.v.shell_error ~= 0 then
+		base = "main"
+	end
+	vim.cmd("DiffviewOpen " .. base .. "...HEAD --imply-local")
+end, { desc = "Diffview: branch vs base" })
+vim.keymap.set("n", "<leader>gh", "<Cmd>DiffviewFileHistory %<CR>", { desc = "Diffview: file history" })
+vim.keymap.set("n", "<leader>gH", "<Cmd>DiffviewFileHistory<CR>", { desc = "Diffview: repo history" })
+vim.keymap.set("n", "<leader>gq", "<Cmd>DiffviewClose<CR>", { desc = "Diffview: close" })
 vim.keymap.set({ "n", "x" }, "<leader>cf", function()
 	require("conform").format()
 end, { desc = "Format" })
