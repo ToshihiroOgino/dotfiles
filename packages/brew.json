@@ -16,7 +16,6 @@
     "ripgrep",
     "tmux",
     "trash-cli",
-    "tree-sitter-cli",
     "uv",
     "zsh-autosuggestions",
     "zsh-completions"
