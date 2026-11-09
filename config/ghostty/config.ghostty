@@ -16,6 +16,7 @@ keybind = super+ctrl+shift+arrow_down=unbind
 keybind = super+ctrl+shift+arrow_left=unbind
 keybind = super+ctrl+shift+arrow_right=unbind
 keybind = ctrl+shift+enter=unbind
+keybind = super+b=text:\x02
 
 theme = Gruvbox Dark Hard
 
