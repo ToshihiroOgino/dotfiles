@@ -37,6 +37,10 @@
       "rev": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d",
       "src": "https://github.com/mason-org/mason.nvim"
     },
+    "mini.icons": {
+      "rev": "eab3e692d796d78ea6ffc978d8a380ff26fcf4e3",
+      "src": "https://github.com/nvim-mini/mini.icons"
+    },
     "mini.tabline": {
       "rev": "3dd8686c15e3cfb1bfbc4abfecf699326f1de4c0",
       "src": "https://github.com/echasnovski/mini.tabline"

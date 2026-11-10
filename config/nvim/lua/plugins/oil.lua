@@ -1,4 +1,9 @@
-vim.pack.add({ "https://github.com/stevearc/oil.nvim" }, { confirm = false })
+vim.pack.add({
+	"https://github.com/nvim-mini/mini.icons",
+	"https://github.com/stevearc/oil.nvim",
+}, { confirm = false })
+
+require("mini.icons").setup()
 
 local patterns = vim.tbl_map(vim.glob.to_lpeg, require("config.exclude"))
 
