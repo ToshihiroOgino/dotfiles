@@ -1,15 +1,17 @@
 #!/bin/sh
-# Install a pinned Neovim release from the official tarball. Idempotent.
+# Install the latest Neovim release from the official tarball. Idempotent.
 #   sh external/nvim.sh
 # Extracted to ~/.local/share/neovim/<version> (not share/nvim: that is nvim's
-# own data dir); on unix ~/.local/bin/nvim links to it, older versions are kept.
+# own data dir); on unix ~/.local/bin/nvim links to it, older versions are removed.
 # Windows has no link: its bin goes on the user PATH (external/path-windows.ps1).
 set -eu
 
-VERSION=0.12.6
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 PLATFORM=$(sh "$ROOT/scripts/os.sh")
-DEST=$HOME/.local/share/neovim/$VERSION
+# Set NVIM_VERSION to pin a release.
+STORE=$HOME/.local/share/neovim
+VERSION=${NVIM_VERSION:-$(sh "$ROOT/scripts/external-version.sh" neovim/neovim "$STORE")}
+DEST=$STORE/$VERSION
 BIN=$HOME/.local/bin
 
 case $PLATFORM-$(uname -m) in
@@ -68,3 +70,5 @@ else
     echo "link     $BIN/nvim -> $DEST/bin/nvim"
   fi
 fi
+
+sh "$ROOT/scripts/external-prune.sh" "$DEST"

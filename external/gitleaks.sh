@@ -1,13 +1,15 @@
 #!/bin/sh
-# Install a pinned gitleaks release. Idempotent.
+# Install the latest gitleaks release. Idempotent.
 #   sh external/gitleaks.sh
 # apt ships a much older version.
 set -eu
 
-VERSION=8.30.1
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 PLATFORM=$(sh "$ROOT/scripts/os.sh")
-DEST=$HOME/.local/share/gitleaks/$VERSION
+# Set GITLEAKS_VERSION to pin a release.
+STORE=$HOME/.local/share/gitleaks
+VERSION=${GITLEAKS_VERSION:-$(sh "$ROOT/scripts/external-version.sh" gitleaks/gitleaks "$STORE")}
+DEST=$STORE/$VERSION
 BIN=$HOME/.local/bin
 URL=https://github.com/gitleaks/gitleaks/releases/download/v$VERSION
 
@@ -84,3 +86,5 @@ else
     echo "link     $BIN/gitleaks -> $exe"
   fi
 fi
+
+sh "$ROOT/scripts/external-prune.sh" "$DEST"

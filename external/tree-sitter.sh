@@ -1,16 +1,18 @@
 #!/bin/sh
-# Install a pinned tree-sitter CLI from the official release. Idempotent.
+# Install the latest tree-sitter CLI from the official release. Idempotent.
 #   sh external/tree-sitter.sh
 # nvim-treesitter (main) needs 0.26.1 or later, newer than most distro packages.
 # Extracted to ~/.local/share/tree-sitter/<version>; on unix ~/.local/bin/tree-sitter
-# links to it, older versions are kept. Windows has no link: its dir goes on the
+# links to it, older versions are removed. Windows has no link: its dir goes on the
 # user PATH (external/path-windows.ps1).
 set -eu
 
-VERSION=0.27.1
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 PLATFORM=$(sh "$ROOT/scripts/os.sh")
-DEST=$HOME/.local/share/tree-sitter/$VERSION
+# Set TREE_SITTER_VERSION to pin a release.
+STORE=$HOME/.local/share/tree-sitter
+VERSION=${TREE_SITTER_VERSION:-$(sh "$ROOT/scripts/external-version.sh" tree-sitter/tree-sitter "$STORE")}
+DEST=$STORE/$VERSION
 BIN=$HOME/.local/bin
 
 case $PLATFORM-$(uname -m) in
@@ -53,3 +55,5 @@ else
     echo "link     $BIN/tree-sitter -> $exe"
   fi
 fi
+
+sh "$ROOT/scripts/external-prune.sh" "$DEST"
