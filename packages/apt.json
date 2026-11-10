@@ -63,6 +63,7 @@
     "syncthing",
     "ppa:ubuntusway-dev/stable",
     "flatpak",
-    "postgresql-client"
+    "postgresql-client",
+    "slack-desktop"
   ]
 }
