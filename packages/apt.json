@@ -38,7 +38,8 @@
     "trash-cli",
     "vim",
     "zip",
-    "zsh"
+    "zsh",
+    "librsvg2-bin"
   ],
   "ignore": [
     "ubuntu-*",
@@ -64,6 +65,7 @@
     "ppa:ubuntusway-dev/stable",
     "flatpak",
     "postgresql-client",
-    "slack-desktop"
+    "slack-desktop",
+    "zoom"
   ]
 }
