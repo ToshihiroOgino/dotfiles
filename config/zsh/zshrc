@@ -36,5 +36,6 @@ alias gcm=which
 
 export CMAKE_GENERATOR=Ninja
 export BAT_PAGER="less -RF --mouse"
+export GH_EDITOR="nvim"
 
 [[ -r ~/.local.zshrc ]] && source ~/.local.zshrc
