@@ -1,4 +1,4 @@
-local active = "github_dark_default" -- "catppuccin" | "gruvbox" | "github_dark_default"
+local active = "catppuccin" -- "catppuccin" | "gruvbox" | "github_dark_default"
 
 vim.pack.add({
   { src = "https://github.com/catppuccin/nvim", name = "catppuccin" },
