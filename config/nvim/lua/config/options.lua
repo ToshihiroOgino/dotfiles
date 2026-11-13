@@ -8,6 +8,9 @@ end
 
 vim.o.fileformat = "unix"
 
+vim.opt.diffopt:remove("inline:char")
+vim.opt.diffopt:append("inline:word")
+
 -- Run :terminal and shell commands in pwsh on Windows.
 if vim.fn.has("win32") == 1 then
 	vim.o.shell = "pwsh"
