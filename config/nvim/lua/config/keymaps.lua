@@ -20,9 +20,22 @@ vim.keymap.set("n", "<leader>gg", function()
 end, { desc = "Lazygit" })
 vim.keymap.set("n", "<leader>gd", "<Cmd>DiffviewOpen<CR>", { desc = "Diffview: working tree" })
 vim.keymap.set("n", "<leader>gm", function()
-	local base = vim.fn.systemlist({ "git", "rev-parse", "--abbrev-ref", "origin/HEAD" })[1]
-	if vim.v.shell_error ~= 0 then
-		base = "main"
+	local base
+	local pr_base
+	if vim.fn.executable("gh") == 1 then
+		pr_base = vim.fn.systemlist({ "gh", "pr", "view", "--json", "baseRefName", "-q", ".baseRefName" })[1]
+	end
+	if pr_base and vim.v.shell_error == 0 and pr_base ~= "" then
+		vim.fn.system({ "git", "rev-parse", "--verify", "--quiet", "origin/" .. pr_base })
+		if vim.v.shell_error == 0 then
+			base = "origin/" .. pr_base
+		end
+	end
+	if not base then
+		base = vim.fn.systemlist({ "git", "rev-parse", "--abbrev-ref", "origin/HEAD" })[1]
+		if vim.v.shell_error ~= 0 then
+			base = "main"
+		end
 	end
 	vim.cmd("DiffviewOpen " .. base .. "...HEAD --imply-local")
 end, { desc = "Diffview: branch vs base" })
