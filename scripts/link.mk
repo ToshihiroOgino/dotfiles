@@ -20,7 +20,7 @@ TOOLS_windows := $(COMMON) pwsh
 
 ALL_TOOLS := $(sort $(TOOLS_wsl) $(TOOLS_linux) $(TOOLS_mac) $(TOOLS_windows))
 
-.PHONY: link link-claude-tmux-state $(addprefix link-,$(ALL_TOOLS))
+.PHONY: link link-claude-tmux-state link-claude-cloud-guard $(addprefix link-,$(ALL_TOOLS))
 
 link: $(addprefix link-,$(TOOLS_$(PLATFORM)))
 
@@ -30,7 +30,9 @@ link-git:
 # Used by both the Claude hooks and tmux.
 link-claude-tmux-state:
 	$(LINK) scripts/claude-tmux-state.sh "$(BIN)/claude-tmux-state"
-link-claude: link-claude-tmux-state
+link-claude-cloud-guard:
+	$(LINK) scripts/claude-cloud-guard.sh "$(BIN)/claude-cloud-guard"
+link-claude: link-claude-tmux-state link-claude-cloud-guard
 	$(LINK) config/claude "$(HOME)/.claude"
 link-tmux: link-claude-tmux-state
 	$(LINK) config/tmux/tmux.conf "$(HOME)/.tmux.conf"
