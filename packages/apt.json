@@ -21,6 +21,7 @@
     "globalprotect-openconnect",
     "golang",
     "imagemagick",
+    "jq",
     "lazygit",
     "librsvg2-bin",
     "lua5.5",
