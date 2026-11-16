@@ -13,7 +13,6 @@
       "Bash(git push* +*)"
     ]
   },
-  "model": "opus",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -85,6 +84,7 @@
       "effortLevel": "high"
     }
   },
+  "advisorModel": "opus",
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
   "theme": "dark"
