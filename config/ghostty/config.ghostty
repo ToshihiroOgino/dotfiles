@@ -1,4 +1,5 @@
 font-family = "Moralerspace Neon"
+font-family = "Noto Sans Math"
 
 keybind = ctrl+enter=unbind
 keybind = f11=toggle_fullscreen

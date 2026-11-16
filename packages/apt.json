@@ -12,6 +12,7 @@
     "fcitx5",
     "fcitx5-mozc",
     "fd-find",
+    "fonts-noto-core",
     "fzf",
     "gh",
     "ghostscript",
@@ -21,6 +22,7 @@
     "golang",
     "imagemagick",
     "lazygit",
+    "librsvg2-bin",
     "lua5.5",
     "make",
     "mesa-utils",
@@ -38,8 +40,7 @@
     "trash-cli",
     "vim",
     "zip",
-    "zsh",
-    "librsvg2-bin"
+    "zsh"
   ],
   "ignore": [
     "ubuntu-*",
