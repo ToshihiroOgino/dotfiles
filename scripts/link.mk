@@ -14,7 +14,7 @@ BIN := $(HOME)/.local/bin
 
 COMMON        := git claude tmux nvim vim lazygit alacritty
 TOOLS_wsl     := $(COMMON) ghostty wsl zsh
-TOOLS_linux   := $(COMMON) ghostty zsh
+TOOLS_linux   := $(COMMON) ghostty zsh sway
 TOOLS_mac     := $(COMMON) ghostty zsh
 TOOLS_windows := $(COMMON) pwsh
 
@@ -72,6 +72,10 @@ link-wsl:
 	$(LINK) config/wsl/zshenv "$(HOME)/.zshenv"
 	$(LINK) scripts/wsl-browser.sh "$(BIN)/wsl-browser"
 	$(LINK) config/wsl/systemd/fcitx5.service "$(HOME)/.config/systemd/user/fcitx5.service"
+
+link-sway:
+	$(LINK) config/sway "$(HOME)/.config/sway"
+	@for f in outputs workspaces; do [ -e "config/sway/$$f" ] || { : >"config/sway/$$f" && echo "create   config/sway/$$f (empty)"; }; done
 
 link-pwsh:
 	@sh $(SCRIPTS)link-pwsh.sh
