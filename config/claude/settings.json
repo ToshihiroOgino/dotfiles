@@ -100,5 +100,6 @@
   "advisorModel": "opus",
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
-  "theme": "dark"
+  "theme": "dark",
+  "preferredNotifChannel": "notifications_disabled"
 }
