@@ -17,6 +17,9 @@ local function setup_native()
 	vim.keymap.set("i", "<S-Tab>", function()
 		return vim.fn.pumvisible() == 1 and "<C-p>" or "<S-Tab>"
 	end, { expr = true, desc = "Previous completion or S-Tab" })
+	vim.keymap.set("i", "<M-Space>", function()
+		vim.lsp.completion.get()
+	end, { desc = "Trigger completion" })
 	vim.keymap.set("i", "<M-i>", function()
 		toggle()
 		vim.o.autocomplete = vim.g.completion_enabled
@@ -31,6 +34,7 @@ local function setup_blink()
 		keymap = {
 			preset = "default",
 			["<C-space>"] = {},
+			["<M-Space>"] = { "show", "fallback" },
 			["<Tab>"] = { "select_next", "fallback" },
 			["<S-Tab>"] = { "select_prev", "fallback" },
 			["<M-i>"] = {
