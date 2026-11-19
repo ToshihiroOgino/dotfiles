@@ -1,5 +1,7 @@
 vim.keymap.set("i", "<C-c>", "<Esc>", { desc = "Leave insert mode (fires InsertLeave)" })
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
+vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "Open line below" })
+vim.keymap.set("i", "<C-S-CR>", "<C-o>O", { desc = "Open line above" })
 vim.keymap.set({ "n", "i" }, "<C-s>", "<Cmd>write<CR><Esc>", { desc = "Save and return to normal mode" })
 
 vim.keymap.set("n", "<leader>ff", function()
@@ -56,6 +58,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("lsp_keymaps", { clear = true }),
 	callback = function(args)
 		vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = args.buf, desc = "Definition" })
+		for _, lhs in ipairs({ "grn", "<F2>", "<leader>rn" }) do
+			vim.keymap.set("n", lhs, vim.lsp.buf.rename, { buffer = args.buf, desc = "Rename symbol" })
+		end
 	end,
 })
 
