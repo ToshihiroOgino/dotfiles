@@ -45,6 +45,9 @@ vim.keymap.set("n", "<leader>gq", "<Cmd>DiffviewClose<CR>", { desc = "Diffview: 
 vim.keymap.set({ "n", "x" }, "<leader>cf", function()
 	require("conform").format()
 end, { desc = "Format" })
+vim.keymap.set({ "n", "x", "i" }, "<M-F>", function()
+	require("conform").format()
+end, { desc = "Format" })
 
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("lsp_keymaps", { clear = true }),
