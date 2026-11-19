@@ -24,6 +24,7 @@
     "jq",
     "lazygit",
     "librsvg2-bin",
+    "libudev-dev",
     "lua5.5",
     "make",
     "mesa-utils",
