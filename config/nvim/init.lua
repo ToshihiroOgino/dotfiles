@@ -1,6 +1,7 @@
 require("config.options")
 require("config.keymaps")
 require("config.autocmds")
+require("config.session")
 require("plugins.colorscheme")
 require("plugins.snacks")
 require("plugins.oil")
