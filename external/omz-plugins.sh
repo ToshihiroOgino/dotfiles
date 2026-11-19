@@ -7,10 +7,11 @@ DEST=${ZSH_CUSTOM:-$OMZ/custom}/plugins
 
 PLUGINS="
 zsh-autosuggestions https://github.com/zsh-users/zsh-autosuggestions.git
+zsh-completions https://github.com/zsh-users/zsh-completions.git
 "
 
 if [ ! -d "$OMZ" ]; then
-  echo "skip     zsh-plugins (oh-my-zsh not installed)"
+  echo "skip     omz-plugins (oh-my-zsh not installed)"
   exit 0
 fi
 mkdir -p "$DEST"
@@ -38,6 +39,6 @@ echo "$PLUGINS" | while read -r name url; do
     git -C "$dir" reset --hard --quiet FETCH_HEAD
     echo "update   $name"
   else
-    echo "outdated $name (UPDATE=1 make zsh-plugins)"
+    echo "outdated $name (UPDATE=1 make omz-plugins)"
   fi
 done
