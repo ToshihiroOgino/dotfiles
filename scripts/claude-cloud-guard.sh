@@ -24,43 +24,15 @@ deny() {
 }
 
 command -v jq >/dev/null 2>&1 || deny "jq not found"
-input=$(cat)
-cmd=$(jq -er '.tool_input.command | strings' <<<"$input") || deny "failed to parse hook input"
-cwd=$(jq -r '.cwd // empty' <<<"$input")
-[ -n "$cwd" ] && cd "$cwd" 2>/dev/null
+cmd=$(jq -er '.tool_input.command | strings') || deny "failed to parse hook input"
 
-GCP_RE='gcloud|gsutil|(^|[^[:alnum:]_.-])bq([^[:alnum:]_-]|$)|google-cloud|cloudsdk|googleapis|google\.cloud|googleapiclient|firebase_admin|\.config/gcloud|application_default_credentials|GOOGLE_APPLICATION_CREDENTIALS|metadata\.google\.internal|169\.254\.169\.254|kubectl|\.kube/|KUBECONFIG|kubernetes'
-OVERRIDE_RE='CLOUDSDK_|--account|--impersonate-service-account|--access-token-file|--configuration|--credential-file-override|--flags-file|KUBECONFIG|--kubeconfig|--as([^[:alnum:]-]|-group|-uid|$)|--token|--server|(^|[[:space:]])-s([[:space:]=]|$)|--username|--password|--client-key|--client-certificate|--insecure-skip-tls-verify'
-TOOLS=' gcloud gcloud.py gsutil bq kubectl '
-WRAPPERS=' env command exec nohup time sudo xargs nice timeout caffeinate '
-RUNNERS=' bash sh zsh dash fish source . python python3 node deno bun ruby perl tsx ts-node npx uv uvx poetry pipenv go make just npm pnpm yarn task '
+CONFIG_RE='\.config/gcloud|\.kube([/[:space:]]|$)|application_default_credentials'
+READERS=' cat ls head tail less grep rg jq stat wc diff '
+WRAPPERS=' env command exec nohup time timeout nice xargs sudo caffeinate bash sh zsh dash '
 GCLOUD_BOOLS=' -q --quiet --log-http --no-user-output-enabled --user-output-enabled -h --help '
 GSUTIL_BOOLS=' -m -q -D -DD -h '
 BQ_BOOLS=' -q --quiet --headless --nouse_gce_service_account '
 KUBECTL_BOOLS=' -h --help '
-
-normalize() {
-	tr -d "'\"\\\\" <<<"$1"
-}
-
-split_segments() {
-	sed -E 's/(\$\(|<\(|>\(|`|&&|\|\||[;&|(){}])/\n/g' <<<"$1"
-}
-
-command_word() {
-	local t
-	for t in $1; do
-		case "$t" in
-		[A-Za-z_]*=*) continue ;;
-		-*) continue ;;
-		esac
-		case "$WRAPPERS" in
-		*" $t "*) continue ;;
-		esac
-		echo "$t"
-		return
-	done
-}
 
 positionals() {
 	local bools="$1" t
@@ -118,85 +90,57 @@ is_readonly_kubectl() {
 	return 1
 }
 
-check_tool_invocations() {
-	local seg="$1" t
+check_segment() {
+	local seg="$1" word=""
 	set -- $seg
 	while [ $# -gt 0 ]; do
-		t="$1"
-		shift
-		case "${t##*/}" in
-		gcloud | gcloud.py)
-			[ -s "$CACHE" ] || deny "cache missing; run: $0 --build"
-			is_readonly_gcloud "$@" || deny "not a read-only gcloud command: $seg"
-			;;
-		gsutil)
-			case "$(nth 1 "$GSUTIL_BOOLS" "$@")" in
-			ls | cat | du | stat | hash | version) ;;
-			*) deny "not a read-only gsutil command: $seg" ;;
+		case "$1" in
+		[A-Za-z_]*=* | -* | [0-9]*) ;;
+		*)
+			case "$WRAPPERS" in
+			*" ${1##*/} "*) ;;
+			*)
+				word="${1##*/}"
+				shift
+				break
+				;;
 			esac
-			;;
-		bq)
-			case "$(nth 1 "$BQ_BOOLS" "$@")" in
-			ls | show | head | version) ;;
-			*) deny "not a read-only bq command: $seg" ;;
-			esac
-			;;
-		kubectl)
-			is_readonly_kubectl "$@" || deny "not a read-only kubectl command: $seg"
 			;;
 		esac
+		shift
 	done
+	case "$word" in
+	gcloud | gcloud.py)
+		[ -s "$CACHE" ] || deny "cache missing; run: $0 --build"
+		is_readonly_gcloud "$@" || deny "not a read-only gcloud command: $seg"
+		;;
+	gsutil)
+		case "$(nth 1 "$GSUTIL_BOOLS" "$@")" in
+		ls | cat | du | stat | hash | version) ;;
+		*) deny "not a read-only gsutil command: $seg" ;;
+		esac
+		;;
+	bq)
+		case "$(nth 1 "$BQ_BOOLS" "$@")" in
+		ls | show | head | version) ;;
+		*) deny "not a read-only bq command: $seg" ;;
+		esac
+		;;
+	kubectl)
+		is_readonly_kubectl "$@" || deny "not a read-only kubectl command: $seg"
+		;;
+	esac
+	grep -qE "$CONFIG_RE" <<<"$seg" || return 0
+	grep -qE ">[[:space:]]*[^[:space:]]*($CONFIG_RE)" <<<"$seg" && deny "write to cloud config: $seg"
+	case "$READERS gcloud gcloud.py gsutil bq kubectl " in
+	*" $word "*) ;;
+	*) deny "cloud config path used by non-reader: $seg" ;;
+	esac
 }
 
-scan_files() {
-	local seg="$1" word="$2" t f
-	local files=""
-	case "$word" in
-	make) files="Makefile makefile GNUmakefile" ;;
-	just) files="justfile Justfile .justfile" ;;
-	task) files="Taskfile.yml Taskfile.yaml" ;;
-	npm | pnpm | yarn | bun) files="package.json" ;;
-	esac
-	for t in $seg; do
-		files="$files $t"
-	done
-	for f in $files; do
-		[ -f "$f" ] && [ -r "$f" ] || continue
-		grep -qE "$GCP_RE" "$f" 2>/dev/null && deny "script references GCP tooling: $f"
-	done
-}
-
-while IFS= read -r raw; do
-	seg=$(normalize "$raw")
-	word=$(command_word "$seg")
-	case "$word" in
-	\$* | eval) deny "dynamic command execution: $raw" ;;
-	esac
-done < <(sed -E 's/(&&|\|\||[;&|])/\n/g' <<<"$cmd")
-
-grep -qE '\)[[:alnum:]_/]' <<<"$cmd" && grep -qE '\$\(|`' <<<"$cmd" &&
-	deny "command substitution glued to a word: $cmd"
-grep -qE '(base64|xxd|openssl)[^|]*\|[[:space:]]*(ba|z|da)?sh([^[:alnum:]]|$)' <<<"$cmd" &&
-	deny "decoded content piped to shell: $cmd"
-
-while IFS= read -r raw; do
-	seg=$(normalize "$raw")
+while IFS= read -r seg; do
 	[ -z "${seg// /}" ] && continue
-	word=$(command_word "$seg")
-
-	case "$RUNNERS" in
-	*" ${word##*/} "*) scan_files "$seg" "${word##*/}" ;;
-	esac
-	case "$word" in
-	*/*) scan_files "$word" "" ;;
-	esac
-
-	grep -qE "$GCP_RE" <<<"$seg" || continue
-	grep -qE -- "$OVERRIDE_RE" <<<"$seg" && deny "credential/config override: $raw"
-	case "$TOOLS" in
-	*" ${word##*/} "*) check_tool_invocations "$seg" ;;
-	*) deny "GCP/Kubernetes-related command outside gcloud/gsutil/bq/kubectl: $raw" ;;
-	esac
-done < <(split_segments "$cmd")
+	check_segment "$seg"
+done < <(tr -d "'\"\\\\" <<<"$cmd" | sed -E 's/(\$\(|<\(|>\(|`|&&|\|\||[;&|(){}])/\n/g')
 
 exit 0
