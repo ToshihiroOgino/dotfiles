@@ -28,7 +28,10 @@ export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 
 (( $+commands[bat] )) || alias bat=batcat
-if (( $+commands[trash] )); then
+
+if [[ $OSTYPE == darwin* ]]; then
+  rm() { /usr/bin/trash "${@:#-*}" }
+elif (( $+commands[trash] )); then
   alias rm=trash
 else
   print -u2 "warning: trash-cli not found, rm deletes permanently"
