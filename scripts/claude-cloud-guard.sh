@@ -24,7 +24,10 @@ deny() {
 }
 
 command -v jq >/dev/null 2>&1 || deny "jq not found"
-cmd=$(jq -er '.tool_input.command | strings') || deny "failed to parse hook input"
+input=$(cat)
+cmd=$(jq -er '.tool_input.command | strings' <<<"$input") || deny "failed to parse hook input"
+dir=$(jq -r '.cwd // empty' <<<"$input")
+dir="${dir:-$PWD}"
 
 CONFIG_RE='\.config/gcloud|\.kube([/[:space:]]|$)|application_default_credentials'
 READERS=' cat ls head tail less grep rg jq stat wc diff '
@@ -130,7 +133,37 @@ check_segment() {
 		is_readonly_kubectl "$@" || deny "not a read-only kubectl command: $seg"
 		;;
 	esac
-	grep -qE "$CONFIG_RE" <<<"$seg" || return 0
+	case "$word" in
+	cd | pushd)
+		case "${1:-}" in
+		"") dir="$HOME" ;;
+		/* | \~* | \$*) dir="$1" ;;
+		*) dir="$dir/$1" ;;
+		esac
+		;;
+	esac
+	local text="$seg $dir" t p w=0
+	for t in "$@"; do
+		case "$t" in
+		*'>')
+			w=1
+			continue
+			;;
+		*'>'*)
+			t="${t##*>}"
+			w=1
+			;;
+		esac
+		case "$t" in
+		-*) p="" ;;
+		/* | \~* | \$*) p="$t" ;;
+		*) p="$dir/$t" ;;
+		esac
+		text="$text $p"
+		[ "$w" = 1 ] && grep -qE "$CONFIG_RE" <<<"$p" && deny "write to cloud config: $seg"
+		w=0
+	done
+	grep -qE "$CONFIG_RE" <<<"$text" || return 0
 	grep -qE ">[[:space:]]*[^[:space:]]*($CONFIG_RE)" <<<"$seg" && deny "write to cloud config: $seg"
 	case "$READERS gcloud gcloud.py gsutil bq kubectl " in
 	*" $word "*) ;;
