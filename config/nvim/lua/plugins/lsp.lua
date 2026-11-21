@@ -10,6 +10,12 @@ vim.lsp.config("lua_ls", {
 	},
 })
 
+vim.diagnostic.config({
+	virtual_text = false,
+	virtual_lines = { current_line = true },
+	severity_sort = true,
+})
+
 -- lspconfig names. The mason package names live in mason.lua.
 vim.lsp.enable({
 	"gopls",
