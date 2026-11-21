@@ -1,4 +1,3 @@
 #!/bin/sh
-# Open a URL in the Windows default browser
-/mnt/c/Windows/explorer.exe "$@"
+/mnt/c/Windows/System32/rundll32.exe url.dll,FileProtocolHandler "$@"
 exit 0
