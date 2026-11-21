@@ -17,6 +17,12 @@ local function setup_native()
 	vim.keymap.set("i", "<S-Tab>", function()
 		return vim.fn.pumvisible() == 1 and "<C-p>" or "<S-Tab>"
 	end, { expr = true, desc = "Previous completion or S-Tab" })
+	vim.keymap.set("i", "<CR>", function()
+		if vim.fn.pumvisible() == 1 and vim.fn.complete_info({ "selected" }).selected ~= -1 then
+			return "<C-y>"
+		end
+		return "<CR>"
+	end, { expr = true, desc = "Accept selected completion or Enter" })
 	vim.keymap.set("i", "<M-Space>", function()
 		vim.lsp.completion.get()
 	end, { desc = "Trigger completion" })
@@ -35,6 +41,7 @@ local function setup_blink()
 			preset = "default",
 			["<C-space>"] = {},
 			["<M-Space>"] = { "show", "fallback" },
+			["<CR>"] = { "accept", "fallback" },
 			["<Tab>"] = { "select_next", "fallback" },
 			["<S-Tab>"] = { "select_prev", "fallback" },
 			["<M-i>"] = {
