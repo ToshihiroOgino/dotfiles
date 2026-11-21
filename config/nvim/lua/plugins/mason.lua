@@ -24,6 +24,8 @@ require("mason-tool-installer").setup({
 		"biome",
 		-- markdown, yaml
 		"prettier",
+		-- spell
+		"typos-lsp",
 	},
 	start_delay = 3000,
 })

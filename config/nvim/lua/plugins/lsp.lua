@@ -10,6 +10,13 @@ vim.lsp.config("lua_ls", {
 	},
 })
 
+vim.lsp.config("typos_lsp", {
+	init_options = {
+		config = vim.fn.stdpath("config") .. "/typos.toml",
+		diagnosticSeverity = "Hint",
+	},
+})
+
 vim.diagnostic.config({
 	virtual_text = false,
 	virtual_lines = { current_line = true },
@@ -25,4 +32,5 @@ vim.lsp.enable({
 	"jsonls",
 	"biome", -- json, js, ts: lint and format
 	"ts_ls", -- js, ts: definitions, references, completion
+	"typos_lsp",
 })
