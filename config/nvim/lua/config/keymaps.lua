@@ -20,32 +20,67 @@ vim.keymap.set("n", "<leader>fR", function()
 	Snacks.picker.recent()
 end, { desc = "Recent files" })
 vim.keymap.set("n", "<leader>e", "<Cmd>Oil<CR>", { desc = "Open parent directory" })
-vim.keymap.set("n", "<leader>gg", function()
-	Snacks.lazygit()
-end, { desc = "Lazygit" })
-vim.keymap.set("n", "<leader>gd", "<Cmd>DiffviewOpen<CR>", { desc = "Diffview: working tree" })
-vim.keymap.set("n", "<leader>gm", function()
-	local base
-	local pr_base
-	if vim.fn.executable("gh") == 1 then
-		pr_base = vim.fn.systemlist({ "gh", "pr", "view", "--json", "baseRefName", "-q", ".baseRefName" })[1]
+local function run(cmd, cwd)
+	local res = vim.system(cmd, { cwd = cwd, text = true }):wait()
+	if res.code ~= 0 then
+		return nil
 	end
-	if pr_base and vim.v.shell_error == 0 and pr_base ~= "" then
-		vim.fn.system({ "git", "rev-parse", "--verify", "--quiet", "origin/" .. pr_base })
-		if vim.v.shell_error == 0 then
+	local out = vim.trim(res.stdout or "")
+	return out ~= "" and out or nil
+end
+
+local function buffer_git_root(silent)
+	local file = vim.api.nvim_buf_get_name(0)
+	local root
+	if vim.bo.buftype == "" and file ~= "" then
+		local dir = vim.fn.fnamemodify(file, ":p:h")
+		if vim.fn.isdirectory(dir) == 1 then
+			root = run({ "git", "rev-parse", "--show-toplevel" }, dir)
+		end
+	end
+	root = root or run({ "git", "rev-parse", "--show-toplevel" }, vim.fn.getcwd())
+	if not root and not silent then
+		vim.notify("Not a git repository", vim.log.levels.WARN)
+	end
+	return root
+end
+
+local function diffview(subcmd, args)
+	local root = buffer_git_root()
+	if root then
+		vim.cmd(subcmd .. " -C" .. vim.fn.fnameescape(root) .. " " .. (args or ""))
+	end
+end
+
+vim.keymap.set("n", "<leader>gg", function()
+	Snacks.lazygit({ cwd = buffer_git_root(true) })
+end, { desc = "Lazygit" })
+vim.keymap.set("n", "<leader>gd", function()
+	diffview("DiffviewOpen")
+end, { desc = "Diffview: working tree" })
+vim.keymap.set("n", "<leader>gm", function()
+	local root = buffer_git_root()
+	if not root then
+		return
+	end
+	local base
+	if vim.fn.executable("gh") == 1 then
+		local pr_base = run({ "gh", "pr", "view", "--json", "baseRefName", "-q", ".baseRefName" }, root)
+		if pr_base and run({ "git", "rev-parse", "--verify", "--quiet", "origin/" .. pr_base }, root) then
 			base = "origin/" .. pr_base
 		end
 	end
-	if not base then
-		base = vim.fn.systemlist({ "git", "rev-parse", "--abbrev-ref", "origin/HEAD" })[1]
-		if vim.v.shell_error ~= 0 then
-			base = "main"
-		end
-	end
-	vim.cmd("DiffviewOpen " .. base .. "...HEAD --imply-local")
+	base = base or run({ "git", "rev-parse", "--abbrev-ref", "origin/HEAD" }, root) or "main"
+	diffview("DiffviewOpen", base .. "...HEAD --imply-local")
 end, { desc = "Diffview: branch vs base" })
-vim.keymap.set("n", "<leader>gh", "<Cmd>DiffviewFileHistory %<CR>", { desc = "Diffview: file history" })
-vim.keymap.set("n", "<leader>gH", "<Cmd>DiffviewFileHistory<CR>", { desc = "Diffview: repo history" })
+vim.keymap.set("n", "<leader>gh", function()
+	local file = vim.api.nvim_buf_get_name(0)
+	local is_file = vim.bo.buftype == "" and file ~= "" and vim.fn.filereadable(file) == 1
+	diffview("DiffviewFileHistory", is_file and vim.fn.fnameescape(vim.fn.fnamemodify(file, ":p")) or "")
+end, { desc = "Diffview: file history" })
+vim.keymap.set("n", "<leader>gH", function()
+	diffview("DiffviewFileHistory")
+end, { desc = "Diffview: repo history" })
 vim.keymap.set("n", "<leader>gq", "<Cmd>DiffviewClose<CR>", { desc = "Diffview: close" })
 vim.keymap.set({ "n", "x" }, "<leader>cf", function()
 	require("conform").format()
