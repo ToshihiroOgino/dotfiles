@@ -1,3 +1,4 @@
+vim.keymap.set("n", "q", "<Nop>", { desc = "Disable macro recording" })
 vim.keymap.set("i", "<C-c>", "<Esc>", { desc = "Leave insert mode (fires InsertLeave)" })
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
 vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "Open line below" })
