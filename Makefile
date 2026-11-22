@@ -5,7 +5,7 @@ include scripts/link.mk
 
 all: tools link external systemd-enable
 
-.PHONY: all ime pkgsync gpvpn systemd-enable external nvim tree-sitter gitleaks omz omz-plugins claude tpm
+.PHONY: all ime pkgsync gpvpn systemd-enable external nvim tree-sitter gitleaks omz omz-plugins gitstatus claude tpm
 
 EXE := $(if $(filter windows,$(FAMILY)),.exe)
 
@@ -26,7 +26,7 @@ gpvpn:
 systemd-enable:
 	@sh $(SCRIPTS)systemd-enable.sh
 
-external: nvim tree-sitter gitleaks omz omz-plugins claude tpm
+external: nvim tree-sitter gitleaks omz omz-plugins gitstatus claude tpm
 
 nvim:
 	@sh external/nvim.sh
@@ -36,6 +36,9 @@ gitleaks:
 
 tree-sitter:
 	@sh external/tree-sitter.sh
+
+gitstatus:
+	@if [ "$(PLATFORM)" != windows ]; then sh external/gitstatus.sh; fi
 
 claude:
 	@sh external/claude.sh
