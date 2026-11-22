@@ -5,6 +5,8 @@
 //	pkgsync [diff]   print the difference and refresh packages/pending/
 //	                 (--throttle: skip if the last successful run is under 5 minutes old)
 //	pkgsync apply    add new and drop removed packages in packages/<mgr>.json
+//	pkgsync disable-prompt  stop the shell prompt from running pkgsync and showing the summary
+//	pkgsync enable-prompt   undo disable-prompt
 //	pkgsync help     show the usage
 //
 // Package managers are detected from PATH. pkgsync never touches git and
@@ -29,6 +31,9 @@ commands:
          diff --throttle does nothing if the last successful run is under 5 minutes old
          (for shell startup; redirect the output yourself)
   apply  add new packages to the list
+  disable-prompt  stop shells from running pkgsync at startup and showing the prompt summary
+                  (per machine; takes effect in new shells)
+  enable-prompt   undo disable-prompt
   help   show this help
 
 Failures are logged to log/pkgsync/<UTC time>.log.
@@ -75,6 +80,10 @@ func main() {
 			err = cmdDiff(root, optOn)
 		case "apply":
 			err = cmdApply(root)
+		case "disable-prompt":
+			err = cmdDisablePrompt(root)
+		case "enable-prompt":
+			err = cmdEnablePrompt(root)
 		default:
 			fmt.Fprintf(os.Stderr, "pkgsync: unknown command %q\n", cmd)
 			flag.Usage()

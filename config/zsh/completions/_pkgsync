@@ -5,6 +5,8 @@ local -a commands=(
   'init:create an empty packages/<mgr>.json for every supported manager'
   'diff:show the difference with the tracked lists (default)'
   'apply:add new packages to the list'
+  'disable-prompt:stop shells from running pkgsync and showing the summary'
+  'enable-prompt:undo disable-prompt'
   'help:show the usage'
 )
 

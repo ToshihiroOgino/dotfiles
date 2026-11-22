@@ -17,6 +17,8 @@ make build
 ./pkgsync                  # show the difference and refresh packages/pending/
 ./pkgsync diff --throttle  # same, but skipped if the last successful run is under 5 min old (shell startup)
 ./pkgsync apply            # add new packages to the list and drop removed ones
+./pkgsync disable-prompt    # stop new shells from running pkgsync and showing the prompt summary
+./pkgsync enable-prompt     # undo disable-prompt
 ./pkgsync help             # list the commands
 ```
 

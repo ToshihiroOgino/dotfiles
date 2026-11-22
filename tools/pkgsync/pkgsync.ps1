@@ -5,6 +5,7 @@
 $root = if ($env:PKGSYNC_ROOT) { $env:PKGSYNC_ROOT } else { Join-Path $HOME 'dotfiles' }
 $exe = Join-Path $root 'tools\pkgsync\pkgsync.exe'
 if (-not (Test-Path -LiteralPath $exe)) { return }
+if (Test-Path -LiteralPath (Join-Path $root 'packages\pending\.prompt-disabled')) { return }
 
 $env:PKGSYNC_ROOT = $root
 Set-Alias -Name pkgsync -Value $exe -Scope Global

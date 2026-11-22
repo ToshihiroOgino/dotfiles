@@ -39,6 +39,11 @@ func cmdDiff(root string, throttle bool) error {
 	if len(ms) == 0 {
 		return errNoManager
 	}
+	if throttle {
+		if _, err := os.Stat(promptDisabledFile(root)); err == nil {
+			return nil
+		}
+	}
 	stamp := filepath.Join(root, "packages", "pending", ".stamp")
 	// Checked before the lock so that most shell startups never contend for
 	// it, and again after, in case a run finished while this one waited.
@@ -286,4 +291,20 @@ func writePending(root string, m Manager, d Diff, warnings []string) error {
 		return err
 	}
 	return updateSummary(dir)
+}
+
+func promptDisabledFile(root string) string {
+	return filepath.Join(root, "packages", "pending", ".prompt-disabled")
+}
+
+func cmdDisablePrompt(root string) error {
+	return putFile(promptDisabledFile(root), "disabled\n")
+}
+
+func cmdEnablePrompt(root string) error {
+	err := os.Remove(promptDisabledFile(root))
+	if errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+	return err
 }
