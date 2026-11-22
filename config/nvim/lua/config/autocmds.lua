@@ -29,3 +29,27 @@ vim.api.nvim_create_autocmd("VimResized", {
 		vim.api.nvim_set_current_tabpage(tab)
 	end,
 })
+
+vim.o.autoread = true
+
+local checktime_group = vim.api.nvim_create_augroup("auto_checktime", { clear = true })
+
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "TermLeave" }, {
+	group = checktime_group,
+	callback = function()
+		if vim.fn.mode() ~= "c" then
+			vim.cmd("silent! checktime")
+		end
+	end,
+})
+
+local checktime_timer = assert(vim.uv.new_timer())
+checktime_timer:start(
+	1000,
+	1000,
+	vim.schedule_wrap(function()
+		if vim.fn.mode() ~= "c" then
+			vim.cmd("silent! checktime")
+		end
+	end)
+)
