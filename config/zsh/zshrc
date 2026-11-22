@@ -28,7 +28,11 @@ if [[ -r $_gitstatus_zsh ]]; then
 
   _git_prompt_update() {
     _git_prompt=
-    gitstatus_query -t 0.5 PROMPT || return
+    _git_prompt_warn=
+    if ! gitstatus_query -t ${GITSTATUS_TIMEOUT:-0.5} PROMPT; then
+      [[ $VCS_STATUS_RESULT == tout ]] && _git_prompt_warn=$'%F{red}gitstatus: timeout%f\n'
+      return
+    fi
     [[ $VCS_STATUS_RESULT == ok-sync ]] || return
     local ref=${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT[1,8]}}
     local mark=
@@ -40,7 +44,7 @@ if [[ -r $_gitstatus_zsh ]]; then
   }
   autoload -Uz add-zsh-hook
   add-zsh-hook precmd _git_prompt_update
-  _prompt_git='${_git_prompt}'
+  _prompt_git='${_git_prompt_warn}${_git_prompt}'
 fi
 
 setopt prompt_subst
