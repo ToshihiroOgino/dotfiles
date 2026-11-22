@@ -83,9 +83,18 @@
       }
     ]
   },
+  "extraKnownMarketplaces": {
+    "tshr-skills": {
+      "source": {
+        "source": "github",
+        "repo": "ToshihiroOgino/skills"
+      }
+    }
+  },
   "enabledPlugins": {
     "clangd-lsp@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "tshr@tshr-skills": true
   },
   "outputStyle": "Concise",
   "modelSettings": {
