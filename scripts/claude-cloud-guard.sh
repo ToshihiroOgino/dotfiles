@@ -1,23 +1,6 @@
 #!/usr/bin/env bash
 set -uf
 
-CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/claude-cloud-guard/readonly-commands.txt"
-
-if [ "${1:-}" = "--build" ]; then
-	set -o pipefail
-	mkdir -p "$(dirname "$CACHE")"
-	if gcloud meta list-commands |
-		grep -E ' (list|list-[a-z-]+|describe|get-iam-policy|read|tail|ls|cat|du|search-all-[a-z-]+)$|^gcloud (version|info|config get|config get-value)$' |
-		sed 's/^gcloud //' >"$CACHE.tmp" && [ -s "$CACHE.tmp" ]; then
-		mv "$CACHE.tmp" "$CACHE"
-		wc -l "$CACHE"
-		exit 0
-	fi
-	rm -f "$CACHE.tmp"
-	echo "claude-cloud-guard: failed to build $CACHE" >&2
-	exit 1
-fi
-
 deny() {
 	echo "claude-cloud-guard: $1" >&2
 	exit 2
@@ -62,13 +45,21 @@ nth() {
 	positionals "$@" | sed -n "${n}p"
 }
 
+GCLOUD_READ_RE='^(list|list-[a-z-]+|describe|get-iam-policy|read|tail|ls|cat|du|search-all-[a-z-]+)$'
+GCLOUD_MUTATING_RE='^((create|delete|update|add|remove|set|patch|import|export|restore|enable|disable|start|stop|reset|resize|attach|detach|move|apply|cancel|submit|replace|rename)-[a-z-]+|[a-z-]+-(add|remove|set|delete|create|update)|create|delete|update|add|remove|set|patch|import|export|restore|enable|disable|start|stop|reset|resize|attach|detach|move|apply|cancel|submit|replace|rename|undelete|deploy|invoke|rollback|bind|unbind|rotate|revoke|publish|destroy|truncate|tag|untag|promote|failover|suspend|resume|reboot|install|uninstall|upgrade|migrate|clone|copy|sync|write|put|execute|exec|ssh|scp|login|access|cp|mv|rm|rsync|connect|call|print-access-token|print-identity-token|activate-service-account|application-default|configure-docker)$'
+
 is_readonly_gcloud() {
-	local path="" t
+	local path="" n=0 t found=1
 	for t in $(positionals "$GCLOUD_BOOLS" "$@"); do
+		n=$((n + 1))
+		grep -qE "$GCLOUD_MUTATING_RE" <<<"$t" && return 1
 		path="${path:+$path }$t"
-		grep -qxF "$path" "$CACHE" && return 0
+		case "$path" in
+		version | info | "config get" | "config get-value") found=0 ;;
+		esac
+		[ "$n" -ge 2 ] && grep -qE "$GCLOUD_READ_RE" <<<"$t" && found=0
 	done
-	return 1
+	return $found
 }
 
 is_readonly_kubectl() {
@@ -114,7 +105,6 @@ check_segment() {
 	done
 	case "$word" in
 	gcloud | gcloud.py)
-		[ -s "$CACHE" ] || deny "cache missing; run: $0 --build"
 		is_readonly_gcloud "$@" || deny "not a read-only gcloud command: $seg"
 		;;
 	gsutil)
