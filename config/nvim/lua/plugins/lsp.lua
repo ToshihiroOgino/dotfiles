@@ -26,6 +26,7 @@ vim.diagnostic.config({
 -- lspconfig names. The mason package names live in mason.lua.
 vim.lsp.enable({
 	"gopls",
+	"clangd",
 	"lua_ls",
 	"bashls",
 	"taplo",

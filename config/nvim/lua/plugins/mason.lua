@@ -9,6 +9,8 @@ require("mason-tool-installer").setup({
 	ensure_installed = {
 		-- go
 		"gopls",
+		-- c, cpp
+		"clangd",
 		-- lua
 		"lua-language-server",
 		"stylua",
