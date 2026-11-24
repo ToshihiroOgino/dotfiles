@@ -159,3 +159,13 @@ end, { desc = "Delete other buffers" })
 vim.keymap.set("n", "<leader>ba", function()
 	Snacks.bufdelete.all()
 end, { desc = "Delete all buffers" })
+
+local function toggle_terminal()
+	Snacks.terminal.toggle(nil, {
+		win = { position = "float", border = "rounded", width = 0.8, height = 0.8 },
+		start_insert = true,
+		auto_insert = true,
+	})
+end
+vim.keymap.set({ "n", "t" }, "<C-/>", toggle_terminal, { desc = "Toggle floating terminal" })
+vim.keymap.set({ "n", "t" }, "<C-_>", toggle_terminal, { desc = "Toggle floating terminal" })
