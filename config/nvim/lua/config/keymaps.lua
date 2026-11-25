@@ -4,6 +4,11 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { silent = true, desc = "Cle
 vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "Open line below" })
 vim.keymap.set("i", "<C-S-CR>", "<C-o>O", { desc = "Open line above" })
 vim.keymap.set({ "n", "i" }, "<C-s>", "<Cmd>write<CR><Esc>", { desc = "Save and return to normal mode" })
+for _, lhs in ipairs({ "<C-/>", "<C-_>" }) do
+	vim.keymap.set("n", lhs, "gcc", { remap = true, desc = "Toggle comment" })
+	vim.keymap.set("x", lhs, "gc", { remap = true, desc = "Toggle comment" })
+	vim.keymap.set("i", lhs, "<C-o>gcc", { remap = true, desc = "Toggle comment" })
+end
 
 vim.keymap.set("n", "<leader>ff", function()
 	Snacks.picker.files()
