@@ -7,6 +7,7 @@ if vim.fn.filereadable(vimrc) == 1 then
 end
 
 vim.o.fileformat = "unix"
+vim.o.undofile = true
 
 vim.opt.diffopt:remove("inline:char")
 vim.opt.diffopt:append("inline:word")

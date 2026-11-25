@@ -53,3 +53,22 @@ checktime_timer:start(
 		end
 	end)
 )
+
+-- remove old undofiles
+local undodir = vim.fn.stdpath("state") .. "/undo"
+local undo_expire = os.time() - 30 * 24 * 60 * 60
+vim.uv.fs_scandir(undodir, function(_, entries)
+	if not entries then
+		return
+	end
+	for name, type in vim.uv.fs_scandir_next, entries do
+		if type == "file" then
+			local path = vim.fs.joinpath(undodir, name)
+			vim.uv.fs_stat(path, function(_, stat)
+				if stat and stat.mtime.sec < undo_expire then
+					vim.uv.fs_unlink(path, function() end)
+				end
+			end)
+		end
+	end
+end)
