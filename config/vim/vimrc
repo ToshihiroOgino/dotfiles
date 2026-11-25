@@ -10,6 +10,7 @@ set noswapfile
 set nobackup
 set nowritebackup
 set scrolloff=5
+set confirm
 set whichwrap+=h,l,<,>,[,]
 set spelllang=en,cjk
 set list

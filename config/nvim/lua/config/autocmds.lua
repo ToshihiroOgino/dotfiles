@@ -54,6 +54,26 @@ checktime_timer:start(
 	end)
 )
 
+local restore_cursor_group = vim.api.nvim_create_augroup("restore_cursor", { clear = true })
+
+vim.api.nvim_create_autocmd("BufReadPre", {
+	group = restore_cursor_group,
+	callback = function(args)
+		vim.api.nvim_create_autocmd("BufWinEnter", {
+			group = restore_cursor_group,
+			buffer = args.buf,
+			once = true,
+			callback = function()
+				local line = vim.fn.line([['"]])
+				local ft = vim.bo[args.buf].filetype
+				if line >= 1 and line <= vim.fn.line("$") and not ft:match("^git") and not vim.wo.diff then
+					vim.cmd([[normal! g`"]])
+				end
+			end,
+		})
+	end,
+})
+
 -- remove old undofiles
 local undodir = vim.fn.stdpath("state") .. "/undo"
 local undo_expire = os.time() - 30 * 24 * 60 * 60
