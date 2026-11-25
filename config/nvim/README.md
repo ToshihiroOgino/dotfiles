@@ -4,6 +4,12 @@
 
 The leader key is Space.
 
+### Editing
+
+| Key     | Action                              |
+| ------- | ----------------------------------- |
+| `<C-a>` | select all (normal, insert, visual) |
+
 ### Find
 
 | Key          | Action       |
