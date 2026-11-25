@@ -167,5 +167,4 @@ local function toggle_terminal()
 		auto_insert = true,
 	})
 end
-vim.keymap.set({ "n", "t" }, "<C-/>", toggle_terminal, { desc = "Toggle floating terminal" })
-vim.keymap.set({ "n", "t" }, "<C-_>", toggle_terminal, { desc = "Toggle floating terminal" })
+vim.keymap.set({ "n", "t" }, "<C-\\>", toggle_terminal, { desc = "Toggle floating terminal" })
