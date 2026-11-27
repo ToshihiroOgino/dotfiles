@@ -15,6 +15,7 @@
     "lua",
     "ripgrep",
     "tmux",
+    "trash-cli",
     "uv",
     "zsh-autosuggestions",
     "zsh-completions"

@@ -69,9 +69,11 @@ alias gcm=which
 
 unalias rm 2>/dev/null
 
-if [[ $OSTYPE == darwin* ]]; then
-  rm() { /usr/bin/trash "${@:#-*}" }
-elif (( $+commands[trash] )); then
+if [[ $OSTYPE == darwin* && -d /opt/homebrew/opt/trash-cli/bin ]]; then
+  path=(/opt/homebrew/opt/trash-cli/bin $path)
+fi
+
+if (( $+commands[trash] )); then
   alias rm=trash
 else
   print -u2 "warning: trash-cli not found, rm deletes permanently"
