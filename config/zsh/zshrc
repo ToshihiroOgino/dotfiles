@@ -18,39 +18,41 @@ if [[ -e "$HOME/.oh-my-zsh" ]]; then
   source $ZSH/oh-my-zsh.sh
 fi
 
-_prompt_git=
-(( $+functions[git_custom_status] )) && _prompt_git='$(git_custom_status)'
+if [[ -t 0 ]]; then
+  _prompt_git=
+  (( $+functions[git_custom_status] )) && _prompt_git='$(git_custom_status)'
 
-_gitstatus_zsh=${GITSTATUS_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/gitstatus}/gitstatus.plugin.zsh
-if [[ -r $_gitstatus_zsh ]]; then
-  source "$_gitstatus_zsh"
-  gitstatus_stop PROMPT && gitstatus_start -s -1 -u -1 -c -1 -d -1 PROMPT
+  _gitstatus_zsh=${GITSTATUS_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/gitstatus}/gitstatus.plugin.zsh
+  if [[ -r $_gitstatus_zsh ]]; then
+    source "$_gitstatus_zsh"
+    gitstatus_stop PROMPT && gitstatus_start -s -1 -u -1 -c -1 -d -1 PROMPT
 
-  _git_prompt_update() {
-    _git_prompt=
-    _git_prompt_warn=
-    if ! gitstatus_query -t ${GITSTATUS_TIMEOUT:-0.5} PROMPT; then
-      [[ $VCS_STATUS_RESULT == tout ]] && _git_prompt_warn=$'%F{red}gitstatus: timeout%f\n'
-      return
-    fi
-    [[ $VCS_STATUS_RESULT == ok-sync ]] || return
-    local ref=${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT[1,8]}}
-    local mark=
-    (( VCS_STATUS_HAS_STAGED || VCS_STATUS_HAS_UNSTAGED || VCS_STATUS_HAS_CONFLICTED )) && mark='%F{red}*%f'
-    local sync=
-    (( VCS_STATUS_COMMITS_AHEAD )) && sync+="↑$VCS_STATUS_COMMITS_AHEAD"
-    (( VCS_STATUS_COMMITS_BEHIND )) && sync+="↓$VCS_STATUS_COMMITS_BEHIND"
-    _git_prompt="$mark%F{green}[${ref//\%/%%}$sync]%f"
-  }
-  autoload -Uz add-zsh-hook
-  add-zsh-hook precmd _git_prompt_update
-  _prompt_git='${_git_prompt_warn}${_git_prompt}'
-fi
+    _git_prompt_update() {
+      _git_prompt=
+      _git_prompt_warn=
+      if ! gitstatus_query -t ${GITSTATUS_TIMEOUT:-0.5} PROMPT; then
+        [[ $VCS_STATUS_RESULT == tout ]] && _git_prompt_warn=$'%F{red}gitstatus: timeout%f\n'
+        return
+      fi
+      [[ $VCS_STATUS_RESULT == ok-sync ]] || return
+      local ref=${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT[1,8]}}
+      local mark=
+      (( VCS_STATUS_HAS_STAGED || VCS_STATUS_HAS_UNSTAGED || VCS_STATUS_HAS_CONFLICTED )) && mark='%F{red}*%f'
+      local sync=
+      (( VCS_STATUS_COMMITS_AHEAD )) && sync+="↑$VCS_STATUS_COMMITS_AHEAD"
+      (( VCS_STATUS_COMMITS_BEHIND )) && sync+="↓$VCS_STATUS_COMMITS_BEHIND"
+      _git_prompt="$mark%F{green}[${ref//\%/%%}$sync]%f"
+    }
+    autoload -Uz add-zsh-hook
+    add-zsh-hook precmd _git_prompt_update
+    _prompt_git='${_git_prompt_warn}${_git_prompt}'
+  fi
 
-setopt prompt_subst
-# Put the input line below the info line.
-PROMPT="$_prompt_git"'%F{cyan}[%~]%f
+  setopt prompt_subst
+  # Put the input line below the info line.
+  PROMPT="$_prompt_git"'%F{cyan}[%~]%f
 %B$%b '
+fi
 
 export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
