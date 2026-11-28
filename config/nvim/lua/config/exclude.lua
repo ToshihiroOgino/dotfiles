@@ -1,4 +1,4 @@
--- Names (glob) hidden from file explorers/pickers; everything else is shown.
+-- Names (glob) hidden from file explorers/pickers.
 return {
 	".git",
 	"node_modules",

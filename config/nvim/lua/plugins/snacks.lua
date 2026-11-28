@@ -1,11 +1,9 @@
 vim.pack.add({ "https://github.com/folke/snacks.nvim" }, { confirm = false })
 
--- Show dotfiles and gitignored files (e.g. logs/) everywhere;
--- hide only what is listed in `exclude` (blacklist).
 local exclude = require("config.exclude")
 
 local function source()
-	return { hidden = true, ignored = true, exclude = exclude }
+	return { hidden = true, ignored = false, exclude = exclude }
 end
 
 -- Run pdflatex via lualatex (bin/pdflatex shim) and load luatexja for Japanese in math.
