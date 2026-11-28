@@ -79,4 +79,6 @@ else
   print -u2 "warning: trash-cli not found, rm deletes permanently"
 fi
 
+(( $+commands[mise] )) && eval "$(mise activate zsh)"
+
 [[ -r ~/.local.zshrc ]] && source ~/.local.zshrc
