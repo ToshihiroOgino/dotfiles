@@ -5,15 +5,11 @@ include scripts/link.mk
 
 all: tools link external systemd-enable
 
-.PHONY: all ime pkgsync gpvpn systemd-enable external nvim tree-sitter gitleaks omz omz-plugins gitstatus claude mise tpm
+.PHONY: all pkgsync gpvpn systemd-enable external nvim tree-sitter gitleaks omz omz-plugins gitstatus claude mise tpm
 
 EXE := $(if $(filter windows,$(FAMILY)),.exe)
 
-tools: ime pkgsync $(if $(filter windows,$(FAMILY)),,gpvpn)
-
-ime:
-	"$(MAKE)" -C tools/ime build
-	$(LINK) tools/ime/ime$(EXE) "$(BIN)/ime$(EXE)"
+tools: pkgsync $(if $(filter windows,$(FAMILY)),,gpvpn)
 
 pkgsync:
 	"$(MAKE)" -C tools/pkgsync build

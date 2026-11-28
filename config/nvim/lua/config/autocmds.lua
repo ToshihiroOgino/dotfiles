@@ -1,4 +1,3 @@
-require("config.ime")
 
 vim.api.nvim_create_autocmd("BufReadPost", {
 	group = vim.api.nvim_create_augroup("readonly_binary", { clear = true }),

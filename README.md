@@ -19,5 +19,4 @@ make external        # fetch externally hosted tools and put them on PATH
 
 ## Tools
 
-- [ime](tools/ime/README.md): reads and switches the IME mode (tmux status bar, IME off during prefix).
 - [pkgsync](tools/pkgsync/README.md): compares installed packages with packages/<manager>.json.
