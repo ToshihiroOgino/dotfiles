@@ -16,27 +16,28 @@ COMMON        := git claude tmux nvim vim lazygit alacritty
 TOOLS_wsl     := $(COMMON) ghostty wsl zsh
 TOOLS_linux   := $(COMMON) ghostty zsh sway
 TOOLS_mac     := $(COMMON) ghostty zsh
-TOOLS_windows := $(COMMON) pwsh
+TOOLS_windows := $(COMMON) psmux pwsh
 
 ALL_TOOLS := $(sort $(TOOLS_wsl) $(TOOLS_linux) $(TOOLS_mac) $(TOOLS_windows))
 
-.PHONY: link link-claude-tmux-state link-claude-cloud-guard $(addprefix link-,$(ALL_TOOLS))
+.PHONY: link link-claude-cloud-guard $(addprefix link-,$(ALL_TOOLS))
 
 link: $(addprefix link-,$(TOOLS_$(PLATFORM)))
 
 link-git:
 	$(LINK) config/git "$(HOME)/.config/git"
 	@[ -e "$(HOME)/.gitconfig" ] || { : >"$(HOME)/.gitconfig" && echo "create   $(HOME)/.gitconfig (empty)"; }
-# Used by both the Claude hooks and tmux.
-link-claude-tmux-state:
-	$(LINK) scripts/claude-tmux-state.sh "$(BIN)/claude-tmux-state"
 link-claude-cloud-guard:
 	$(LINK) scripts/claude-cloud-guard.sh "$(BIN)/claude-cloud-guard"
-link-claude: link-claude-tmux-state link-claude-cloud-guard
+link-claude: link-claude-cloud-guard
 	$(LINK) config/claude "$(HOME)/.claude"
-link-tmux: link-claude-tmux-state
+link-tmux:
+	$(LINK) config/tmux/common.conf "$(HOME)/.tmux.common.conf"
 	$(LINK) config/tmux/tmux.conf "$(HOME)/.tmux.conf"
 	$(LINK_LOCAL) config/tmux/tmux.local.conf "$(HOME)/.tmux.local.conf"
+
+link-psmux: link-tmux
+	$(LINK) config/tmux/psmux.conf "$(HOME)/.psmux.conf"
 
 NVIM_unix    := $(HOME)/.config/nvim
 NVIM_windows := $(LOCALAPPDATA)/nvim
