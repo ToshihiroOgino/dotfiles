@@ -4,6 +4,10 @@ vim.pack.add({
 	"https://github.com/nvim-treesitter/nvim-treesitter-context",
 }, { confirm = false })
 
+if vim.fn.has("win32") == 1 and vim.fn.executable("cl") == 0 then
+	vim.env.CC = vim.env.CC or "gcc"
+end
+
 -- Parsers for the languages used in dotfiles. Installs are async and skip what is already there.
 -- c, lua, vim, vimdoc, query and markdown ship with nvim itself.
 require("nvim-treesitter").install({
