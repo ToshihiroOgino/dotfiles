@@ -5,15 +5,19 @@ include scripts/link.mk
 
 all: tools link external systemd-enable
 
-.PHONY: all pkgsync gpvpn systemd-enable external nvim tree-sitter gitleaks omz omz-plugins gitstatus claude mise tpm
+.PHONY: all pkgsync claude-tmux-state gpvpn systemd-enable external nvim tree-sitter gitleaks omz omz-plugins gitstatus claude mise tpm ppm
 
 EXE := $(if $(filter windows,$(FAMILY)),.exe)
 
-tools: pkgsync $(if $(filter windows,$(FAMILY)),,gpvpn)
+tools: pkgsync claude-tmux-state $(if $(filter windows,$(FAMILY)),,gpvpn)
 
 pkgsync:
 	"$(MAKE)" -C tools/pkgsync build
 	$(LINK) tools/pkgsync/pkgsync$(EXE) "$(BIN)/pkgsync$(EXE)"
+
+claude-tmux-state:
+	"$(MAKE)" -C tools/claude-tmux-state build
+	$(LINK) tools/claude-tmux-state/claude-tmux-state$(EXE) "$(BIN)/claude-tmux-state$(EXE)"
 
 gpvpn:
 	$(LINK) tools/gpvpn/gpvpn "$(BIN)/gpvpn"
@@ -22,7 +26,7 @@ gpvpn:
 systemd-enable:
 	@sh $(SCRIPTS)systemd-enable.sh
 
-external: nvim tree-sitter gitleaks omz omz-plugins gitstatus claude mise tpm
+external: nvim tree-sitter gitleaks omz omz-plugins gitstatus claude mise tpm ppm
 
 nvim:
 	@sh external/nvim.sh
@@ -50,3 +54,6 @@ omz-plugins: omz
 
 tpm:
 	@if [ "$(PLATFORM)" != windows ]; then sh external/tpm.sh; fi
+
+ppm:
+	@if [ "$(PLATFORM)" = windows ]; then sh external/ppm.sh; fi

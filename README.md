@@ -20,3 +20,4 @@ make external        # fetch externally hosted tools and put them on PATH
 ## Tools
 
 - [pkgsync](tools/pkgsync/README.md): compares installed packages with packages/<manager>.json.
+- claude-tmux-state: shows Claude Code's state in the tmux / psmux window list.
