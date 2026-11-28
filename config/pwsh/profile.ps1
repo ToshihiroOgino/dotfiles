@@ -17,6 +17,8 @@ if (Test-Path $pkgsyncPs1) { . $pkgsyncPs1 }
 # Import-Module yarn-completion
 # Import-Module posh-git
 
+Set-Alias -Name v -Value nvim
+
 function reload {
   & $PROFILE.CurrentUserAllHosts
 }
