@@ -19,6 +19,7 @@
     "git-filter-repo",
     "go",
     "innounp",
+    "jq",
     "keepassxc",
     "lazygit",
     "lua-for-windows",
